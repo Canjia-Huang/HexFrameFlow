@@ -20,15 +20,17 @@
 #include <map>
 #include <set>
 #include "AssignmentGroup.h"
-#include <iostream>
-#include <Eigen/Dense>
 
+static double computeDihedralAngle(
+  const Eigen::MatrixXd& V,
+  const CubeCover::TetMeshConnectivity& mesh,
+  const int edge,
+  const int edge_tetid
+  ) {
+  const int v0 = mesh.edgeVertex(edge, 0);
+  const int v1 = mesh.edgeVertex(edge, 1);
 
-static double computeDihedralAngle(const Eigen::MatrixXd& V, const CubeCover::TetMeshConnectivity& mesh, int edge, int edge_tetid) {
-  int v0 = mesh.edgeVertex(edge, 0);
-  int v1 = mesh.edgeVertex(edge, 1);
-
-  int tet_id = mesh.edgeTet(edge, edge_tetid);
+  const int tet_id = mesh.edgeTet(edge, edge_tetid);
 
   int fid0 = mesh.edgeTetFaceIndex(edge, edge_tetid, 0);
   fid0 = mesh.tetFace(tet_id, fid0);
@@ -64,14 +66,14 @@ static double computeDihedralAngle(const Eigen::MatrixXd& V, const CubeCover::Te
   return acos(cos_angle);
 }
 
-void extractSingularCurveNetwork(const Eigen::MatrixXd& V,
-                                 const CubeCover::TetMeshConnectivity& mesh,
-                                 const CubeCover::FrameField& field,
-                                 Eigen::MatrixXd& Pgreen, Eigen::MatrixXi& Egreen,
-                                 Eigen::MatrixXd& Pblue, Eigen::MatrixXi& Eblue,
-                                 Eigen::MatrixXd& Pblack, Eigen::MatrixXi& Eblack
-)
-{
+void extractSingularCurveNetwork(
+  const Eigen::MatrixXd& V,
+  const CubeCover::TetMeshConnectivity& mesh,
+  const CubeCover::FrameField& field,
+  Eigen::MatrixXd& Pgreen, Eigen::MatrixXi& Egreen,
+  Eigen::MatrixXd& Pblue, Eigen::MatrixXi& Eblue,
+  Eigen::MatrixXd& Pblack, Eigen::MatrixXi& Eblack
+  ) {
   std::map<int, int> blacksingverts;
   std::map<int, int> greensingverts;
   std::map<int, int> bluesingverts;
@@ -244,12 +246,13 @@ void extractSingularCurveNetwork(const Eigen::MatrixXd& V,
   }
 }
 
-std::vector<int> getSingularEdgeLabels(const Eigen::MatrixXd& V,
-                                       const CubeCover::TetMeshConnectivity& mesh,
-                                       const CubeCover::FrameField& field
-) {
+std::vector<int> getSingularEdgeLabels(
+  const Eigen::MatrixXd& V,
+  const CubeCover::TetMeshConnectivity& mesh,
+  const CubeCover::FrameField& field
+  ) {
   int nsingedges = field.nSingularEdges();
-  std::vector<int> labels(nsingedges, 2);
+  std::vector labels(nsingedges, 2);
   int vpf = field.vectorsPerFrame();
 
   for (int i = 0; i < nsingedges; i++) {
@@ -274,9 +277,8 @@ std::vector<int> getSingularEdgeLabels(const Eigen::MatrixXd& V,
 
       int fixed = -1;
       for (int j = 0; j < 3; j++) {
-        if (o.targetVector(j) == j && o.targetSign(j) == 1) {
+        if (o.targetVector(j) == j && o.targetSign(j) == 1)
           fixed = j;
-        }
       }
       if (fixed != -1 && nbtet > 0) {
         Eigen::Vector3d edgevec =
@@ -287,7 +289,7 @@ std::vector<int> getSingularEdgeLabels(const Eigen::MatrixXd& V,
         int f2 = (fixed + 2) % 3;
 
         double ave_voting = 0;
-        for (int j = 0; j < nbtet; j++) {
+        for (int j = 0; j < nbtet; ++j) {
           int tet = mesh.edgeTet(edge, j);
           int faceidx = mesh.edgeTetFaceIndex(edge, j, 1);
           int face = mesh.tetFace(tet, faceidx);

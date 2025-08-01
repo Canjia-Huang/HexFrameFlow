@@ -91,16 +91,15 @@ namespace CubeCover
 
 namespace CubeCover
 {
-
     bool CoMISoMIPWrapper(const Eigen::SparseMatrix<double>& constraints,
         const Eigen::SparseMatrix<double>& A,
         Eigen::VectorXd& result,
         const Eigen::VectorXd& b,
         const std::vector<int>& intvars,
         double tol,
-        bool verbose)
-    {
-        std::cerr << "GUROBI not available" << std::endl;
+        bool verbose
+        ) {
+        std::cerr << "CoMISo not available" << std::endl;
         return false;
     }
 };

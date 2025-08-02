@@ -16,13 +16,14 @@
 // =============================================================================
 
 #include "SingularCurveNetwork.h"
-#include "FrameField.h"
-#include "TetMeshConnectivity.h"
+#include <cmath>
 #include <map>
 #include <set>
-#include "AssignmentGroup.h"
-#include <Eigen/Geometry>
 #include <Eigen/Dense>
+#include <Eigen/Geometry>
+#include "AssignmentGroup.h"
+#include "FrameField.h"
+#include "TetMeshConnectivity.h"
 
 static double computeDihedralAngle(
   const Eigen::MatrixXd& V,

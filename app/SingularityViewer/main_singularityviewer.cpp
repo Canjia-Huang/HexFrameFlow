@@ -7,6 +7,8 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
+//   - Use CLI11 for command line control
+//   - Added code comments
 //
 // =============================================================================
 
@@ -20,6 +22,7 @@
 #include "readMeshFixed.h"
 #include "SingularCurveNetwork.h"
 #include "TetMeshConnectivity.h"
+#include "CLI11/CLI11.hpp"
 #include "polyscope/curve_network.h"
 #include "polyscope/point_cloud.h"
 #include "polyscope/polyscope.h"
@@ -27,41 +30,58 @@
 #include "polyscope/volume_mesh.h"
 
 int main(int argc, char *argv[]) {
-    if (argc != 3 && argc != 4 && argc != 5) {
-        std::cerr << "Usage: singularityviewer (.mesh file) (.fra file) [bad_verts path] [.perm file]" << std::endl;
-        return -1;
-    }
-
-    std::string meshfile = argv[1];
-    std::string frafile = argv[2];
+    /* Settings */
+    std::string meshfile;
+    std::string frafile;
+    std::string badverts;
     std::string permfile;
-
     bool recomputeperms = false;
+    bool showViz = true;
 
-    if (argc == 5)
-        permfile = argv[4];
-    else
+    /* App */
+    CLI::App app{"SingularityViewer"};
+    argv = app.ensure_utf8(argv);
+
+    app.add_option(
+        "mesh_path",
+        meshfile,
+        "Tetrahedral mesh file (.mesh) path"
+        )->check(CLI::ExistingFile)->required();
+    app.add_option(
+        "fra_path",
+        frafile,
+        "Frame field file (.fra) path"
+        )->check(CLI::ExistingFile)->required();
+    app.add_option(
+        "bad_verts_path",
+        badverts,
+        "bad_verts path"
+        )->check(CLI::ExistingFile);
+    app.add_option(
+        "perm_path",
+        permfile,
+        "Parameterization file (.perm) path"
+        )->check(CLI::ExistingFile);
+
+    CLI11_PARSE(app, argc, argv);
+
+    /* Process */
+    if (permfile == "")
         recomputeperms = true;
 
-    bool showViz = true;
-    std::string badverts;
-
-    if (argc >= 4) {
-        badverts = argv[3];
+    if (badverts != "") {
         if (badverts != "1")
             showViz = false;
     }
-
     std::cout << badverts << std::endl;
 
     /* Read mesh */
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi T;
+    Eigen::MatrixXd V; // vertices of the tetrahedral mesh
+    Eigen::MatrixXi T; // tetrahedra
     if (Eigen::MatrixXi F;
         !CubeCover::readMESH(meshfile, V, T, F))
         return -1;
-
-    CubeCover::TetMeshConnectivity mesh(T);
+    CubeCover::TetMeshConnectivity mesh(T); // connected tetrahedral mesh
 
     /* Read frame field */
     Eigen::MatrixXd frames;
@@ -117,7 +137,6 @@ int main(int argc, char *argv[]) {
     }
 
     // visualize the seams
-
     std::vector<int> seamfaces;
 
     int ninverted = 0;
@@ -152,7 +171,7 @@ int main(int argc, char *argv[]) {
     std::mt19937 rng(dev());
     std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-    if (showViz) {
+    if (showViz) { // polyscope
         polyscope::init();
 
         auto *tetc = polyscope::registerPointCloud("Centroids", centroids);
@@ -185,22 +204,24 @@ int main(int argc, char *argv[]) {
         auto* seammesh = polyscope::registerSurfaceMesh("Seam", seamV, seamF);
         seammesh->setSurfaceColor({ 0.0, 0.0, 0.0 });
 
-        auto* tetMesh = polyscope::registerTetMesh("Tetrahedral Mesh", V, T);
+        // auto* tetMesh = polyscope::registerTetMesh("Tetrahedral Mesh", V, T);
 
         // visualize!
         polyscope::show();
     }
     else {
-            std::ofstream ofs(badverts);
-            if (!ofs)
+            std::ofstream out(badverts);
+            if (!out) {
+                std::cerr << "Cannot write file: " << badverts << std::endl;
                 return -1;
+            }
             int nsing = field->nSingularEdges();
-            ofs << "ids " << V.rows() << " " << 2 * nsing << std::endl;
+            out << "ids " << V.rows() << " " << 2 * nsing << std::endl;
             for (int i = 0; i < nsing; ++i) {
                 int edge = field->singularEdge(i);
                 int v0 = mesh.edgeVertex(edge, 0);
                 int v1 = mesh.edgeVertex(edge, 1);
-                ofs << v0 << std::endl << v1 << std::endl;
+                out << v0 << std::endl << v1 << std::endl;
             }
 
     }

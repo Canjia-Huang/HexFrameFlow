@@ -18,6 +18,7 @@ find_path(POLYSCOPE_INCLUDE_DIR polyscope/polyscope.h
         ${CMAKE_SOURCE_DIR}/../polyscope
         ${CMAKE_SOURCE_DIR}/../tools/polyscope
         ${CMAKE_SOURCE_DIR}/../../polyscope
+        ${CMAKE_SOURCE_DIR}/../../C_Library/polyscope
         /usr
         /usr/local
         PATH_SUFFIXES include

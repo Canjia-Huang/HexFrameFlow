@@ -35,7 +35,6 @@ namespace CubeCover {
  * Returns false if there are problems reading or parsing the input (set
  * verbose to true for diagnostic information on the console).
  */
-
 bool readFrameField(const std::string& fraFilename, const std::string& permFilename, const Eigen::MatrixXi& T,
                     Eigen::MatrixXd& frames, Eigen::MatrixXi& assignments, bool verbose = false);
 

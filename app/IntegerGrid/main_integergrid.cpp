@@ -50,7 +50,7 @@ int main(const int argc, char *argv[]) {
     app.add_option(
         "output_path",
         outfile,
-        "Output file path"
+        "Output file (.hexex) path"
         );
 
     CLI11_PARSE(app, argc, argv);

@@ -22,19 +22,25 @@
 
 namespace CubeCover {
 
-bool readFrameField(const std::string& fraFilename, const std::string& permFilename, const Eigen::MatrixXi& T,
-                    Eigen::MatrixXd& frames, Eigen::MatrixXi& assignments, bool verbose) {
+bool readFrameField(
+    const std::string& fraFilename,
+    const std::string& permFilename,
+    const Eigen::MatrixXi& T,
+    Eigen::MatrixXd& frames,
+    Eigen::MatrixXi& assignments,
+    const bool verbose
+    ) {
     // check that fraFilename ends in .fra
     // if ends .fra call v1
     // if ends in .bfra call v2
     // else return false
 
-    std::string fraExt = fraFilename.substr(fraFilename.find_last_of(".") + 1);
+    const std::string fraExt = fraFilename.substr(fraFilename.find_last_of('.') + 1);
     if (fraExt == "fra") {
-        bool is_success = readFrameField_v1(fraFilename, permFilename, T, frames, assignments, verbose);
+        const bool is_success = readFrameField_v1(fraFilename, permFilename, T, frames, assignments, verbose);
 
         // convert to gpgpt frame storage
-        int nvpe = frames.rows() / T.rows();
+        const int nvpe = frames.rows() / T.rows();
         Eigen::MatrixXd cur_frames(T.rows(), 3 * nvpe);
         for (int i = 0; i < T.rows(); i++) {
             for (int j = 0; j < nvpe; j++) {
@@ -43,11 +49,12 @@ bool readFrameField(const std::string& fraFilename, const std::string& permFilen
         }
         frames = std::move(cur_frames);
         return is_success;
-    } else if (fraExt == "bfra") {
-        bool is_success = readFrameField_v2(fraFilename, permFilename, T, frames, assignments, verbose);
+    }
+    if (fraExt == "bfra") {
+        const bool is_success = readFrameField_v2(fraFilename, permFilename, T, frames, assignments, verbose);
 
         // convert to gpgpt frame storage
-        int nvpe = frames.rows() / T.rows();
+        const int nvpe = frames.rows() / T.rows();
         Eigen::MatrixXd cur_frames(T.rows(), 3 * nvpe);
         for (int i = 0; i < T.rows(); i++) {
             for (int j = 0; j < nvpe; j++) {
@@ -56,26 +63,32 @@ bool readFrameField(const std::string& fraFilename, const std::string& permFilen
         }
         frames = std::move(cur_frames);
         return is_success;
-    } else if (fraExt == "ff3") {
+    }
+    if (fraExt == "ff3") {
         // check that file name ends in _ascii
 
         // std::cout << fraFilename.substr(fraFilename.find_last_of("_") + 1 ) << std::endl;
 
-        if (fraFilename.substr(fraFilename.find_last_of("_") + 1) == "ascii.ff3") {
+        if (fraFilename.substr(fraFilename.find_last_of('_') + 1) == "ascii.ff3") {
             return deserializeFF3FramesFromMetricDrivenFrames3D(frames, fraFilename);
         } else {
             std::cerr << "please pass in ff3 in ASCII not binary! filename: " << fraFilename << std::endl;
             return false;
         }
 
-    } else {
-        if (verbose) std::cerr << "Unknown file extension: " << fraExt << std::endl;
-        return false;
     }
+    if (verbose) std::cerr << "Unknown file extension: " << fraExt << std::endl;
+    return false;
 }
 
-bool readFrameField_v1(const std::string& fraFilename, const std::string& permFilename, const Eigen::MatrixXi& T,
-                       Eigen::MatrixXd& frames, Eigen::MatrixXi& assignments, bool verbose) {
+bool readFrameField_v1(
+    const std::string& fraFilename,
+    const std::string& permFilename,
+    const Eigen::MatrixXi& T,
+    Eigen::MatrixXd& frames,
+    Eigen::MatrixXi& assignments,
+    bool verbose
+    ) {
     TetMeshConnectivity tetMesh(T);
 
     std::ifstream ifs(fraFilename);
@@ -127,7 +140,7 @@ bool readFrameField_v1(const std::string& fraFilename, const std::string& permFi
 
     assignments.resize(0, 2 + vpt);
 
-    if (permFilename.length() > 0) {
+    if (!permFilename.empty()) {
         std::ifstream permfs(permFilename);
         if (!permfs) {
             if (verbose) std::cerr << "Cannot open file: " << permFilename << std::endl;
@@ -177,8 +190,14 @@ bool readFrameField_v1(const std::string& fraFilename, const std::string& permFi
     return true;
 }
 
-bool readFrameField_v2(const std::string& fraFilename, const std::string& permFilename, const Eigen::MatrixXi& T,
-                       Eigen::MatrixXd& frames, Eigen::MatrixXi& assignments, bool verbose) {
+bool readFrameField_v2(
+    const std::string& fraFilename,
+    const std::string& permFilename,
+    const Eigen::MatrixXi& T,
+    Eigen::MatrixXd& frames,
+    Eigen::MatrixXi& assignments,
+    bool verbose
+    ) {
     TetMeshConnectivity tetMesh(T);
 
     try {
@@ -218,7 +237,10 @@ bool readFrameField_v2(const std::string& fraFilename, const std::string& permFi
     }
 }
 
-bool deserializeFF3FramesFromMetricDrivenFrames3D(Eigen::MatrixXd& mat, const std::string& filepath) {
+bool deserializeFF3FramesFromMetricDrivenFrames3D(
+    Eigen::MatrixXd& mat,
+    const std::string& filepath
+    ) {
     try {
         std::ifstream inFile(filepath);
         if (!inFile.is_open()) {

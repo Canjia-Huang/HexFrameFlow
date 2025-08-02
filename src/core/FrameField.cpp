@@ -253,11 +253,12 @@ FrameField* fromFramesAndAssignments(const TetMeshConnectivity& tetMesh, const E
   return field;
 }
 
-void FrameField::combAssignments() {
-  int ntets = mesh.nTets();
+void FrameField::combAssignments(
+  ) {
+  const int ntets = mesh.nTets();
   if (ntets == 0) return;
 
-  int vpf = vectorsPerFrame();
+  const int vpf = vectorsPerFrame();
 
   std::vector<bool> visited(ntets);
   struct Visit {
@@ -265,7 +266,7 @@ void FrameField::combAssignments() {
     AssignmentGroup g;
   };
 
-  AssignmentGroup identity(vpf);
+  const AssignmentGroup identity(vpf);
   std::deque<Visit> q;
   q.push_back({0, identity});
   visited[0] = true;
@@ -277,9 +278,9 @@ void FrameField::combAssignments() {
 
     frames[next.nextnode] = next.g * frames[next.nextnode];
     for (int i = 0; i < 4; i++) {
-      int face = mesh.tetFace(next.nextnode, i);
-      int orient = mesh.tetFaceOrientation(next.nextnode, i);
-      int nb = mesh.faceTet(face, 1 - orient);
+      const int face = mesh.tetFace(next.nextnode, i);
+      const int orient = mesh.tetFaceOrientation(next.nextnode, i);
+      const int nb = mesh.faceTet(face, 1 - orient);
       if (nb == -1) continue;
 
       AssignmentGroup nextg(vpf);

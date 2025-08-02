@@ -111,17 +111,15 @@ void extractSingularCurveNetwork(
         int orient = mesh.tetFaceOrientation(tet, faceidx);
         CubeCover::AssignmentGroup faceo = field.faceAssignment(face);
 
-        if (orient == 1) {
+        if (orient == 1)
           faceo = faceo.inverse();
-        }
         o = faceo * o;
       }
 
       int fixed = -1;
       for (int j = 0; j < 3; j++) {
-        if (o.targetVector(j) == j && o.targetSign(j) == 1) {
+        if (o.targetVector(j) == j && o.targetSign(j) == 1)
           fixed = j;
-        }
       }
       if (fixed != -1 && nbtet > 0) {
         Eigen::Vector3d edgevec = V.row(mesh.edgeVertex(edge, 1)).transpose() - V.row(mesh.edgeVertex(edge, 0)).transpose();
@@ -155,60 +153,51 @@ void extractSingularCurveNetwork(
         int sign = (ave_voting >= 0 ? 1 : -1);
 
         if (o.targetVector(f1) == f2 && o.targetSign(f1) == -1 && o.targetVector(f2) == f1 && o.targetSign(f2) == 1) {
-          if (sign == 1) {
+          if (sign == 1)
             isgreen = true;
-          } else {
+          else
             isblue = true;
-          }
         }
         else if (o.targetVector(f1) == f2 && o.targetSign(f1) == 1 && o.targetVector(f2) == f1 && o.targetSign(f2) == -1) {
-          if (sign == 1) {
+          if (sign == 1)
             isblue = true;
-          } else {
+          else
             isgreen = true;
-          }
         }
       }
     }
     if (isgreen) {
       auto it = greensingverts.find(v0);
-      if (it == greensingverts.end()) {
+      if (it == greensingverts.end())
         greensingverts[v0] = nextgreenidx++;
-      }
       it = greensingverts.find(v1);
-      if (it == greensingverts.end()) {
+      if (it == greensingverts.end())
         greensingverts[v1] = nextgreenidx++;
-      }
       greensingedges.push_back(edge);
     }
     else if (isblue) {
       auto it = bluesingverts.find(v0);
-      if (it == bluesingverts.end()) {
+      if (it == bluesingverts.end())
         bluesingverts[v0] = nextblueidx++;
-      }
       it = bluesingverts.find(v1);
-      if (it == bluesingverts.end()) {
+      if (it == bluesingverts.end())
         bluesingverts[v1] = nextblueidx++;
-      }
       bluesingedges.push_back(edge);
     }
     else {
       auto it = blacksingverts.find(v0);
-      if (it == blacksingverts.end()) {
+      if (it == blacksingverts.end())
         blacksingverts[v0] = nextblackidx++;
-      }
       it = blacksingverts.find(v1);
-      if (it == blacksingverts.end()) {
+      if (it == blacksingverts.end())
         blacksingverts[v1] = nextblackidx++;
-      }
       blacksingedges.push_back(edge);
     }
   }
 
   Pblack.resize(blacksingverts.size(), 3);
-  for (auto it : blacksingverts) {
+  for (auto it : blacksingverts)
     Pblack.row(it.second) = V.row(it.first);
-  }
 
   int nblacksingedges = blacksingedges.size();
   Eblack.resize(nblacksingedges, 2);
@@ -222,9 +211,8 @@ void extractSingularCurveNetwork(
 
 
   Pgreen.resize(greensingverts.size(), 3);
-  for (auto it : greensingverts) {
+  for (auto it : greensingverts)
     Pgreen.row(it.second) = V.row(it.first);
-  }
 
   int ngreensingedges = greensingedges.size();
   Egreen.resize(ngreensingedges, 2);
@@ -238,9 +226,8 @@ void extractSingularCurveNetwork(
 
 
   Pblue.resize(bluesingverts.size(), 3);
-  for (auto it : bluesingverts) {
+  for (auto it : bluesingverts)
     Pblue.row(it.second) = V.row(it.first);
-  }
 
   int nbluesingedges = bluesingedges.size();
   Eblue.resize(nbluesingedges, 2);

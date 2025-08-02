@@ -32,11 +32,11 @@ namespace CubeCover {
     class FrameField
     {
     public:
-        FrameField(const TetMeshConnectivity& tetMesh);
+        explicit FrameField(const TetMeshConnectivity& tetMesh);
 
-        const TetMeshConnectivity& meshConnectivity() const { return mesh; }
+        [[nodiscard]] const TetMeshConnectivity& meshConnectivity() const { return mesh; }
 
-        int vectorsPerFrame() const { return vpf; }
+        [[nodiscard]] int vectorsPerFrame() const { return vpf; }
 
         /*
          * The number of interior edges of the tet mesh where the frame field
@@ -44,13 +44,13 @@ namespace CubeCover {
          * group, composed together when circulating around the edge, do not
          * yield the identity assignment.
          */
-        int nSingularEdges() const { return singularEdges.size(); }
+        [[nodiscard]] int nSingularEdges() const { return singularEdges.size(); }
 
         /*
          * The nSingularEdges() singular edges (in no particular order). The
          * integer returned is an index into the edges maintained in tetMesh.
          */
-        int singularEdge(int idx) const { return singularEdges[idx]; }
+        [[nodiscard]] int singularEdge(const int idx) const { return singularEdges[idx]; }
 
         /*
          * Creates a frame field from per-tet vectors and per-face frame

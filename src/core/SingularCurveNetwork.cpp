@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
+//   - Resolve the compilation errors related to Eigen in macOS
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -20,6 +21,8 @@
 #include <map>
 #include <set>
 #include "AssignmentGroup.h"
+#include <Eigen/Geometry>
+#include <Eigen/Dense>
 
 static double computeDihedralAngle(
   const Eigen::MatrixXd& V,
@@ -56,13 +59,17 @@ static double computeDihedralAngle(
   }
   assert(v3 != -1);
 
-  Eigen::Vector3d n0 = (V.row(v1) - V.row(v0)).segment<3>(0).cross((V.row(v2) - V.row(v0)).segment<3>(0));
-  Eigen::Vector3d n1 = (V.row(v1) - V.row(v0)).segment<3>(0).cross((V.row(v3) - V.row(v0)).segment<3>(0));
+  const Eigen::Vector3d n0_1 = (V.row(v1) - V.row(v0)).segment<3>(0).eval();
+  const Eigen::Vector3d n0_2 = (V.row(v2) - V.row(v0)).segment<3>(0).eval();
+  Eigen::Vector3d n0 = n0_1.cross(n0_2);
+  const Eigen::Vector3d n1_1 = (V.row(v1) - V.row(v0)).segment<3>(0).eval();
+  const Eigen::Vector3d n1_2 = (V.row(v3) - V.row(v0)).segment<3>(0).eval();
+  Eigen::Vector3d n1 = n1_1.cross(n1_2);
 
   n0.normalize();
   n1.normalize();
 
-  double cos_angle = std::clamp(n0.dot(n1), -1.0, 1.0);
+  const double cos_angle = std::clamp(n0.dot(n1), -1.0, 1.0);
   return acos(cos_angle);
 }
 
@@ -300,6 +307,7 @@ std::vector<int> getSingularEdgeLabels(
 
           Eigen::Vector3d f2_vec = field.tetFrame(tet).row(o.targetVector(f2)).transpose();
           f2_vec *= o.targetSign(f2);
+
           Eigen::Vector3d framevec = f1_vec.cross(f2_vec);
 
           double angle = computeDihedralAngle(V, mesh, edge, j);

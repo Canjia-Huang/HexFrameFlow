@@ -29,4 +29,4 @@ find_package_handle_standard_args(Polyscope
         POLYSCOPE_INCLUDE_DIR)
 mark_as_advanced(POLYSCOPE_INCLUDE_DIR)
 
-#add_subdirectory("${POLYSCOPE_INCLUDE_DIR}/../" "polyscope")
+add_subdirectory("${POLYSCOPE_INCLUDE_DIR}/../" "polyscope")

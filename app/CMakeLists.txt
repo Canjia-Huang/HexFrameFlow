@@ -16,3 +16,6 @@ target_link_libraries(${PROJECT_NAME}_MAIN
 
 #################### MAIN - Singularity Viewer ####################
 add_subdirectory(SingularityViewer)
+
+#################### MAIN - Integer Grid ####################
+add_subdirectory(IntegerGrid)

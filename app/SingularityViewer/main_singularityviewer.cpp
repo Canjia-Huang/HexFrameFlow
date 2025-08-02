@@ -79,19 +79,25 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd V; // vertices of the tetrahedral mesh
     Eigen::MatrixXi T; // tetrahedra
     if (Eigen::MatrixXi F;
-        !CubeCover::readMESH(meshfile, V, T, F))
+        !CubeCover::readMESH(meshfile, V, T, F)) {
+        std::cerr << "could not read .mesh file: " << meshfile << std::endl;
         return -1;
+    }
     CubeCover::TetMeshConnectivity mesh(T); // connected tetrahedral mesh
 
     /* Read frame field */
     Eigen::MatrixXd frames;
     Eigen::MatrixXi assignments;
-    if (!CubeCover::readFrameField(frafile, permfile, T, frames, assignments, true))
+    if (!CubeCover::readFrameField(frafile, permfile, T, frames, assignments, true)) {
+        std::cerr << "could not read frames/permutations" << std::endl;
         return -1;
+    }
 
     CubeCover::FrameField* field = CubeCover::fromFramesAndAssignments(mesh, frames, assignments, true);
-    if (!field)
+    if (!field) {
+        std::cerr << "could not build field" << std::endl;
         return -1;
+    }
 
     if (recomputeperms) {
         std::cout << "No face assignments provided, recomputing: ";

@@ -27,7 +27,7 @@ struct CubeCoverOptions {
         : parameterizationType(ParameterizationType::PT_SEAMLESS),
           assignmentHandling(AssignmentHandling::AH_USEPROVIDED),
           boundaryConditions(BoundaryConditions::BC_FREE),
-          solver(MIPSolver::MS_GUROBI),
+          solver(MIPSolver::MS_COMISO),
           MIPtol(1e-6),
           scale(1.0),
           curlCorrection(0.0),
@@ -174,7 +174,7 @@ struct CubeCoverOptions {
  * might be available on failure if verbose is set to true in opt.
  */
 bool cubeCover(const Eigen::MatrixXd& V, const Eigen::MatrixXi& T, const Eigen::MatrixXd& frames,
-               const Eigen::MatrixXi& assignments, Eigen::MatrixXd& parameterization, CubeCoverOptions opt);
+               const Eigen::MatrixXi& assignments, Eigen::MatrixXd& parameterization, const CubeCoverOptions &opt);
 
 /*
  * As above, but use default parameters (integer-grid parameterization, force

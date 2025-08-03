@@ -24,8 +24,6 @@ add_subdirectory(IntegerGrid)
 #################### MAIN - Volume Param Viewer ####################
 add_subdirectory(VolumeParamViewer)
 
-add_subdirectory(Seamless)
-
 add_subdirectory(IsolineViewer)
 
 add_subdirectory(libHexEx_cmdline_tool)

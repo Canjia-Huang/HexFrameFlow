@@ -16,6 +16,8 @@
 #include <iostream>
 #include <random>
 #include <Eigen/Core>
+
+#include "CurlCorrection.h"
 #include "FrameField.h"
 #include "FrameFieldVis.h"
 #include "ReadFrameField.h"
@@ -28,6 +30,8 @@
 #include "polyscope/polyscope.h"
 #include "polyscope/surface_mesh.h"
 #include "polyscope/volume_mesh.h"
+#include "utils/log.h"
+#include "utils/parse_filepath.h"
 
 int main(int argc, char *argv[]) {
     /* Settings */
@@ -45,42 +49,41 @@ int main(int argc, char *argv[]) {
     app.add_option(
         "mesh_path",
         meshfile,
-        "Tetrahedral mesh file (.mesh) path"
+        "Tetrahedral mesh file (.mesh) path."
         )->check(CLI::ExistingFile)->required();
     app.add_option(
         "fra_path",
         frafile,
-        "Frame field file (.fra) path"
-        )->check(CLI::ExistingFile)->required();
+        "Frame field file (.fra) path."
+        )->check(CLI::ExistingFile);
     app.add_option(
         "bad_verts_path",
         badverts,
-        "bad_verts path"
+        "bad_verts path."
         )->check(CLI::ExistingFile);
     app.add_option(
         "perm_path",
         permfile,
-        "Parameterization file (.perm) path"
+        "Parameterization file (.perm) path."
         )->check(CLI::ExistingFile);
 
     CLI11_PARSE(app, argc, argv);
 
     /* Process */
-    if (permfile == "")
+    if (permfile.empty())
         recomputeperms = true;
 
     if (badverts != "") {
         if (badverts != "1")
             showViz = false;
     }
-    std::cout << badverts << std::endl;
 
     /* Read mesh */
     Eigen::MatrixXd V; // vertices of the tetrahedral mesh
     Eigen::MatrixXi T; // tetrahedra
     if (Eigen::MatrixXi F;
         !CubeCover::readMESH(meshfile, V, T, F)) {
-        std::cerr << "could not read .mesh file: " << meshfile << std::endl;
+        LOG::ERROR("could not read .mesh file: {}", meshfile);
         return -1;
     }
     CubeCover::TetMeshConnectivity mesh(T); // connected tetrahedral mesh
@@ -89,21 +92,24 @@ int main(int argc, char *argv[]) {
     Eigen::MatrixXd frames;
     Eigen::MatrixXi assignments;
     if (!CubeCover::readFrameField(frafile, permfile, T, frames, assignments, true)) {
-        std::cerr << "could not read frames/permutations" << std::endl;
-        return -1;
+        /* Try to read file: mesh_filename.fra */
+        frafile = get_parentpath(meshfile) + get_filename(meshfile) + ".fra";
+        if (!CubeCover::readFrameField(frafile, permfile, T, frames, assignments, true)) {
+            LOG::ERROR("could not read frames/permutations");
+            return -1;
+        }
     }
 
     CubeCover::FrameField* field = CubeCover::fromFramesAndAssignments(mesh, frames, assignments, true);
     if (!field) {
-        std::cerr << "could not build field" << std::endl;
+        LOG::ERROR("could not build field");
         return -1;
     }
 
     if (recomputeperms) {
-        std::cout << "No face assignments provided, recomputing: ";
-        std::cout.flush();
+        LOG::INFO("No face assignments provided, recomputing");
         field->computeLocalAssignments();
-        std::cout << "found " << field->nSingularEdges() << " singular edges" << std::endl;
+        LOG::INFO("found {} singular edges", field->nSingularEdges());
     }
     field->combAssignments();
 
@@ -135,8 +141,8 @@ int main(int argc, char *argv[]) {
             for (int j = 0; j < 3; j++)
                 bdryF(curidx, j) = mesh.faceVertex(i, j);
             // fix triangle orientations
-            int tet = mesh.faceTet(i, 0);
-            if (tet == -1)
+            if (int tet = mesh.faceTet(i, 0);
+                tet == -1)
                 std::swap(bdryF(curidx, 0), bdryF(curidx, 1));
             curidx++;
         }
@@ -158,9 +164,9 @@ int main(int argc, char *argv[]) {
             ninverted++;
     }
 
-    std::cout << "Non-identity face assignments: " << nnontrivial << std::endl;
+    LOG::INFO("Non-identity face assignments: {}", nnontrivial);
     if (ninverted > 0)
-        std::cout << "Warning: " << ninverted << " face assignments are orientation-reversing" << std::endl;
+        LOG::WARN("Warning: {} face assignments are orientation-reversing", ninverted);
 
     int nseamtris = seamfaces.size();
 
@@ -173,6 +179,92 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    /* about curl */
+    int vpf = field->vectorsPerFrame();
+    Eigen::SparseMatrix<double> C;
+    buildCurlMatrix(vpf,  V, *field, C);
+    int ntets = field->meshConnectivity().nTets();
+
+    Eigen::VectorXd unrolled(ntets * vpf * 3);
+    double minval = 100000000;
+    double maxval = -100000000;
+    for (int i = 0; i < ntets; i++) {
+        for (int j = 0; j < vpf; j++) {
+            unrolled.segment<3>(3 * vpf * i + 3 * j) = field->tetFrame(i).row(j);
+
+            for (int k = 0; k < 3 ; k++) {
+                auto blah = field->tetFrame(i).row(j);
+                if ( abs(blah(k)) > maxval)
+                    maxval = abs(blah(k));
+                if (abs(blah(k)) < minval)
+                    minval = abs(blah(k));
+            }
+        }
+    }
+
+    LOG::INFO("min val: {}", minval);
+    LOG::INFO("max val: {}", maxval);
+
+    Eigen::VectorXd all_curl = C * unrolled;
+    Eigen::VectorXd per_tet_sum_curl = Eigen::VectorXd::Zero(ntets);
+
+    int row = 0;
+    for (int i = 0; i < nfaces; i++) {
+        int t0 = mesh.faceTet(i, 0);
+        int t1 = mesh.faceTet(i, 1);
+        if (t0 == -1 || t1 == -1)
+            continue;
+
+        for (int j = 0; j < vpf; j++) {
+            for (int k = 0; k < 3; k++) {
+                    int blockId = row;
+                    per_tet_sum_curl(t0) += abs(all_curl(blockId + 3*j + k));
+                    per_tet_sum_curl(t1) += abs(all_curl(blockId + 3*j + k));
+            }
+        }
+        row += 3 * vpf;
+    }
+
+
+    LOG::INFO("allCurl.max: {}",all_curl.maxCoeff());
+    LOG::INFO("allCurl.max: {}",all_curl.minCoeff());
+    LOG::INFO("unrolled.max: {}",unrolled.maxCoeff());
+    LOG::INFO("unrolled.max: {}",unrolled.minCoeff());
+
+    double unrolled_min = 1000000;
+    for(int i = 0; i < unrolled.size(); i++) {
+        if ( unrolled_min > abs(unrolled(i)))
+            unrolled_min = abs(unrolled(i));
+    }
+
+    LOG::INFO("unrolled abs min: {}", unrolled_min);
+
+    double all_curl_min = 1000000;
+    for(int i = 0; i < all_curl.size(); i++ ) {
+        if ( all_curl_min > abs(all_curl(i)))
+            all_curl_min = abs(all_curl(i));
+
+        if ( abs(all_curl(i)) < 1e-13 && abs(all_curl(i)) > 0)
+            LOG::INFO("FISHY {} {}", i, abs(all_curl(i)));
+    }
+
+    LOG::INFO("all_curl abs min: {}", all_curl_min);
+
+    double per_tet_sum_curl_min = 1000000;
+    for(int i = 0; i < per_tet_sum_curl.size(); i++ ) {
+        if ( per_tet_sum_curl_min > abs(per_tet_sum_curl(i)))
+            per_tet_sum_curl_min = abs(per_tet_sum_curl(i));
+
+        if ( abs(per_tet_sum_curl(i)) < 1e-10 && abs(per_tet_sum_curl(i)) > 0)
+            LOG::INFO("FISHY {} {}", i, abs(per_tet_sum_curl(i)));
+    }
+
+    LOG::INFO("per_tet_sum abs min: {}", per_tet_sum_curl_min);
+
+    LOG::INFO("min frame entry: {}", frames.minCoeff());
+    LOG::INFO("max frame entry: {}", frames.maxCoeff());
+
+    /* Polyscope */
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -184,8 +276,9 @@ int main(int argc, char *argv[]) {
         glm::vec3 dotcolor(0.1, 0.1, 0.1);
         tetc->setPointColor(dotcolor);
         tetc->setPointRadius(0.001);
-        int vpf = framefieldvecs.size();
-        for (int i = 0; i < vpf; i++) {
+        for (int i = 0, i_end = framefieldvecs.size(); i < i_end; i++) {
+            if (i % 2 == 0)
+                continue;
             std::stringstream ss;
             ss << "Frame Vector " << i;
             auto *vf = tetc->addVectorQuantity(ss.str(), framefieldvecs[i]);
@@ -203,6 +296,10 @@ int main(int argc, char *argv[]) {
         auto *black = polyscope::registerCurveNetwork("Singular Curves (irregular)", Pblack, Eblack);
         black->setColor({ 0.0,0.0,0.0 });
 
+        polyscope::registerTetMesh("tet_mesh", V, T);
+        auto scalarQ = polyscope::getVolumeMesh("tet_mesh")->addCellScalarQuantity("real_curl_sum", per_tet_sum_curl);
+        scalarQ->setEnabled(true);
+
         auto *psMesh = polyscope::registerSurfaceMesh("Boundary Mesh", V, bdryF);
         psMesh->setTransparency(0.2);
         psMesh->setSurfaceColor({ 0.5,0.5,0.0 });
@@ -210,15 +307,13 @@ int main(int argc, char *argv[]) {
         auto* seammesh = polyscope::registerSurfaceMesh("Seam", seamV, seamF);
         seammesh->setSurfaceColor({ 0.0, 0.0, 0.0 });
 
-        // auto* tetMesh = polyscope::registerTetMesh("Tetrahedral Mesh", V, T);
-
         // visualize!
         polyscope::show();
     }
     else {
             std::ofstream out(badverts);
             if (!out) {
-                std::cerr << "Cannot write file: " << badverts << std::endl;
+                LOG::ERROR( "Cannot write file: {}", badverts);
                 return -1;
             }
             int nsing = field->nSingularEdges();

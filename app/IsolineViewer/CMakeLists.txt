@@ -1,19 +1,20 @@
-add_executable(ISOLINE_VIEWER
+add_executable(isolineviewer
         main.cpp
 )
 
-target_sources(ISOLINE_VIEWER
+target_sources(isolineviewer
         PRIVATE
         ExtractIsolines.cpp
 )
 
-target_include_directories(ISOLINE_VIEWER
+target_include_directories(isolineviewer
         PRIVATE
         "${CMAKE_SOURCE_DIR}/deps"
+        "${CMAKE_SOURCE_DIR}/src"
         "${CMAKE_SOURCE_DIR}/src/CubeCover"
 )
 
-target_link_libraries(ISOLINE_VIEWER
+target_link_libraries(isolineviewer
         PRIVATE
         ${PROJECT_NAME}_CubeCover
         polyscope

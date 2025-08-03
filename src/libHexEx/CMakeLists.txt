@@ -8,7 +8,8 @@ target_include_directories(${PROJECT_NAME}_libHexEx
 
 # configure sources
 file(GLOB LIBHEXEX_SOURCE
-        ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 
 # add sources to the library
 target_sources(${PROJECT_NAME}_libHexEx

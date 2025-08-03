@@ -40,16 +40,17 @@ FIND_PATH(OPENVOLUMEMESH_INCLUDE_DIR OpenVolumeMesh/Mesh/TetrahedralMesh.hh
         "${CMAKE_SOURCE_DIR}/OpenVolumeMesh/src"
         "${CMAKE_SOURCE_DIR}/libs_required/OpenVolumeMesh/src"
         "${CMAKE_SOURCE_DIR}/../OpenVolumeMesh/src"
-        /ACG/acgdev/gcc-4.0-x86_64/OVM/OpenVolumeMesh/installed/include
+        "/ACG/acgdev/gcc-4.0-x86_64/OVM/OpenVolumeMesh/installed/include"
         "C:\\Program Files\\OpenVolumeMesh\\include"
+        "D:\\C_Library\\OpenVolumeMesh\\src"
 )
 
 IF (OPENVOLUMEMESH_INCLUDE_DIR )
     SET(OPENVOLUMEMESH_FOUND TRUE)
     ADD_DEFINITIONS(-DENABLE_OPENVOLUMEMESH)
     IF (WIN32)
-        IF(EXISTS "${OPENVOLUMEMESH_INCLUDE_DIR}/../Build/lib")
-            SET(OPENVOLUMEMESH_LIBRARY_DIR "${OPENVOLUMEMESH_INCLUDE_DIR}/../Build/lib")
+        IF(EXISTS "${OPENVOLUMEMESH_INCLUDE_DIR}/../Build/lib/Release")
+            SET(OPENVOLUMEMESH_LIBRARY_DIR "${OPENVOLUMEMESH_INCLUDE_DIR}/../Build/lib/Release")
         ENDIF()
     ELSE (WIN32)
         IF(EXISTS "${OPENVOLUMEMESH_INCLUDE_DIR}/../Build/lib")

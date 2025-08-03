@@ -1,1 +1,2 @@
-add_subdirectory(core)
+add_subdirectory(CubeCover)
+add_subdirectory(libHexEx)

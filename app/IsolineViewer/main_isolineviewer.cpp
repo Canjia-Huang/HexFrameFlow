@@ -1,0 +1,103 @@
+// =============================================================================
+// This file contains code derived from the following source(s):
+//   Original Repository: https://github.com/evouga/CubeCover
+//   Original File Path:  /tools/isolineviewer/src/main.cpp
+//
+// Copyright (c) 2025 evouga
+// -----------------------------------------------------------------------------
+// Modifications made by Canjia Huang on 2025-8-3:
+//   - Adjusted code formatting in selected sections
+//   - Use CLI11 for command line control
+//   - Added code comments
+//
+// =============================================================================
+
+
+#include "polyscope/polyscope.h"
+#include "polyscope/curve_network.h"
+#include <Eigen/Core>
+#include <iostream>
+#include "TetMeshConnectivity.h"
+#include "ReadHexEx.h"
+#include "polyscope/surface_mesh.h"
+#include "ExtractIsolines.h"
+#include <Eigen/Dense>
+
+
+#include "polyscope/point_cloud.h"
+
+int main(int argc, char *argv[])
+{
+    if (argc != 2)
+    {
+        std::cerr << "Usage: isolineviewer (.hexex file)" << std::endl;
+        return -1;
+    }
+
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi T;
+
+    std::string hexexfile = argv[1];
+
+    Eigen::MatrixXd values;
+    if (!CubeCover::readHexEx(hexexfile, V, T, values))
+    {
+        std::cerr << "error reading the .hexex file" << std::endl;
+        return -1;
+    }
+
+    CubeCover::TetMeshConnectivity mesh(T);
+
+    Eigen::MatrixXd P;
+    Eigen::MatrixXi E;
+
+    Eigen::MatrixXd P2;
+    Eigen::MatrixXi E2;
+
+    extractIsolines(V, mesh, values, P, E, P2, E2);
+
+    // make a mesh out of all of the boundary faces
+    int nbdry = 0;
+    int nfaces = mesh.nFaces();
+    for (int i = 0; i < nfaces; i++)
+    {
+        if (mesh.isBoundaryFace(i))
+            nbdry++;
+    }
+    Eigen::MatrixXi bdryF(nbdry, 3);
+    int curidx = 0;
+    for (int i = 0; i < nfaces; i++)
+    {
+        if (mesh.isBoundaryFace(i))
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                bdryF(curidx, j) = mesh.faceVertex(i, j);
+
+            }
+            // fix triangle orientations
+            int tet = mesh.faceTet(i, 0);
+            if (tet == -1)
+            {
+                std::swap(bdryF(curidx, 0), bdryF(curidx, 1));
+            }
+            curidx++;
+        }
+    }
+
+    polyscope::init();
+
+
+    auto *psCurves = polyscope::registerCurveNetwork("Isolines", P, E);
+    psCurves->setRadius(0.003);
+    auto *psCurves2 = polyscope::registerCurveNetwork("Bad Isolines", P2, E2);
+    psCurves2->setRadius(0.003);
+    auto *psMesh = polyscope::registerSurfaceMesh("Boundary Mesh", V, bdryF);
+    psMesh->setTransparency(0.2);
+
+
+
+
+    // visualize!
+    polyscope::show();
+}

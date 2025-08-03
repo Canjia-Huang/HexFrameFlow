@@ -1,20 +1,20 @@
-add_executable(${PROJECT_NAME}_SINGULARITY_VIEWER
+add_executable(SINGULARITY_VIEWER
     main_singularityviewer.cpp
 )
 
-target_sources(${PROJECT_NAME}_SINGULARITY_VIEWER
+target_sources(SINGULARITY_VIEWER
     PRIVATE
     FrameFieldVis.cpp
 )
 
-target_include_directories(${PROJECT_NAME}_SINGULARITY_VIEWER
+target_include_directories(SINGULARITY_VIEWER
     PRIVATE
     "${CMAKE_SOURCE_DIR}/deps"
-    "${CMAKE_SOURCE_DIR}/src/core"
+    "${CMAKE_SOURCE_DIR}/src/CubeCover"
 )
 
-target_link_libraries(${PROJECT_NAME}_SINGULARITY_VIEWER
+target_link_libraries(SINGULARITY_VIEWER
     PRIVATE
-    ${PROJECT_NAME}_CORE
+    ${PROJECT_NAME}_CubeCover
     polyscope
 )

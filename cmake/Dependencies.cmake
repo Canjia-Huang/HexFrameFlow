@@ -37,3 +37,9 @@ if(USE_GUROBI)
         include_directories(${GUROBI_INCLUDE_DIRS})
     endif()
 endif()
+
+############################################# OpenVolumeMesh #############################################
+find_package(OpenVolumeMesh REQUIRED)
+add_definitions(-DNDEBUG)
+include_directories(${OPENVOLUMEMESH_INCLUDE_DIR})
+link_directories(${OPENVOLUMEMESH_LIBRARY_DIR})

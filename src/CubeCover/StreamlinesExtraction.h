@@ -16,6 +16,7 @@
 
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <Eigen/Core>
 #include <vector>
 
@@ -26,7 +27,7 @@ namespace CubeCover {
 // The streamline tracing point: start from the start_pt_ and the tracing direction is given by dir_
 // To identify whether this stream pts is redundant: two stream pts has the "same" start_pts and same dir
 struct StreamPt {
-  StreamPt(const Eigen::Vector3d start_pt, const Eigen::Vector3d& dir, double eps = 1e-6, int face_id = -1) : start_pt_(start_pt), dir_(dir), face_id_(face_id), eps_(eps) {
+  StreamPt(const Eigen::Vector3d &start_pt, const Eigen::Vector3d& dir, double eps = 1e-6, int face_id = -1) : start_pt_(start_pt), dir_(dir), face_id_(face_id), eps_(eps) {
     dir_.normalize();
   }
 

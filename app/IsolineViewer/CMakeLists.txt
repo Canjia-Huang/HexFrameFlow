@@ -1,5 +1,5 @@
 add_executable(ISOLINE_VIEWER
-        main_isolineviewer.cpp
+        main.cpp
 )
 
 target_sources(ISOLINE_VIEWER

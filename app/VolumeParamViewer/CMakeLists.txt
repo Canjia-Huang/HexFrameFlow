@@ -1,5 +1,5 @@
 add_executable(VOLUME_PARAM_VIEWER
-        main_volumeparamviewer.cpp
+        main.cpp
 )
 
 target_sources(VOLUME_PARAM_VIEWER

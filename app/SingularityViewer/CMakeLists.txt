@@ -1,5 +1,5 @@
 add_executable(SINGULARITY_VIEWER
-    main_singularityviewer.cpp
+        main.cpp
 )
 
 target_sources(SINGULARITY_VIEWER

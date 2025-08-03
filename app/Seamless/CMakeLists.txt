@@ -1,5 +1,5 @@
 add_executable(SEAMLESS
-        main_seamless.cpp
+        main.cpp
 )
 
 target_include_directories(SEAMLESS

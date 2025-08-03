@@ -1,14 +1,15 @@
-add_executable(LIBHEXEX_CMDLINE_TOOL
+add_executable(hexex
         main.cpp
 )
 
-target_include_directories(LIBHEXEX_CMDLINE_TOOL
+target_include_directories(hexex
         PRIVATE
         "${CMAKE_SOURCE_DIR}/deps"
         "${CMAKE_SOURCE_DIR}/src/libHexEx"
+        "${CMAKE_SOURCE_DIR}/src"
 )
 
-target_link_libraries(LIBHEXEX_CMDLINE_TOOL
+target_link_libraries(hexex
         PRIVATE
         ${PROJECT_NAME}_libHexEx
         ${OPENVOLUMEMESH_LIBRARY}

@@ -18,16 +18,33 @@ inline std::string get_filename(
     const std::filesystem::path inPath(path);
 
     const std::string filename_w_ex = inPath.filename().string();
-    if (const std::size_t pos = filename_w_ex.find_last_of(".");
+    if (const std::size_t pos = filename_w_ex.find_last_of('.');
         pos != std::string::npos)
         return filename_w_ex.substr(0, pos);
     return "";
 }
 
 /**
+ * Get the extension from a file path
+ * @param path
+ * @return extension or empty string
+ */
+inline std::string get_extension(
+    const std::string& path
+    ) {
+    const std::filesystem::path inPath(path);
+
+    const std::string filename_w_ex = inPath.filename().string();
+    if (const std::size_t pos = filename_w_ex.find_last_of('.');
+        pos != std::string::npos)
+        return filename_w_ex.substr(pos + 1);
+    return "";
+}
+
+/**
  * Get the parent path from a file path.
  * @param path
- * @return
+ * @return parent path
  */
 inline std::string get_parentpath(
     const std::string& path

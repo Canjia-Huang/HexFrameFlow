@@ -11,5 +11,5 @@ target_include_directories(integergrid
 
 target_link_libraries(integergrid
         PRIVATE
-        ${PROJECT_NAME}_CubeCover
+        ${PROJECT_NAME}_CUBECOVER
 )

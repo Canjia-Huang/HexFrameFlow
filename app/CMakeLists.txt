@@ -15,15 +15,9 @@ target_link_libraries(${PROJECT_NAME}_MAIN
         ${OPENVOLUMEMESH_LIBRARY}
 )
 
-#################### MAIN - Singularity Viewer ####################
-add_subdirectory(SingularityViewer)
-
-#################### MAIN - Integer Grid ####################
+add_subdirectory(FrameFieldGeneration)
 add_subdirectory(IntegerGrid)
-
-#################### MAIN - Volume Param Viewer ####################
-add_subdirectory(VolumeParamViewer)
-
 add_subdirectory(IsolineViewer)
-
-add_subdirectory(libHexEx_cmdline_tool)
+add_subdirectory(libHexEx)
+add_subdirectory(SingularityViewer)
+add_subdirectory(VolumeParamViewer)

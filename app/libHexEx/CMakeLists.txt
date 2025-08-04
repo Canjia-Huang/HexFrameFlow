@@ -11,6 +11,6 @@ target_include_directories(hexex
 
 target_link_libraries(hexex
         PRIVATE
-        ${PROJECT_NAME}_libHexEx
+        ${PROJECT_NAME}_LIBHEXEX
         ${OPENVOLUMEMESH_LIBRARY}
 )

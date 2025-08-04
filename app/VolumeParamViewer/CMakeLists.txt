@@ -16,6 +16,6 @@ target_include_directories(volumeparamviewer
 
 target_link_libraries(volumeparamviewer
         PRIVATE
-        ${PROJECT_NAME}_CubeCover
+        ${PROJECT_NAME}_CUBECOVER
         polyscope
 )

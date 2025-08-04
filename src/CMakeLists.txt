@@ -1,2 +1,3 @@
 add_subdirectory(CubeCover)
 add_subdirectory(libHexEx)
+add_subdirectory(Practical3DFrameFieldGeneration)

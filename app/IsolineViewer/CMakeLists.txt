@@ -16,6 +16,6 @@ target_include_directories(isolineviewer
 
 target_link_libraries(isolineviewer
         PRIVATE
-        ${PROJECT_NAME}_CubeCover
+        ${PROJECT_NAME}_CUBECOVER
         polyscope
 )

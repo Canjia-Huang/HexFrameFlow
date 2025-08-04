@@ -17,6 +17,6 @@ target_include_directories(singularityviewer
 
 target_link_libraries(singularityviewer
         PRIVATE
-        ${PROJECT_NAME}_CubeCover
+        ${PROJECT_NAME}_CUBECOVER
         polyscope
 )

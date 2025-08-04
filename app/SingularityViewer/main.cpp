@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     /* Read mesh */
     Eigen::MatrixXd V; // vertices of the tetrahedral mesh
-    Eigen::MatrixXi T; // tetrahedra
+    Eigen::MatrixXi T; // tets
     if (Eigen::MatrixXi F;
         !CubeCover::readMESH(meshfile, V, T, F)) {
         LOG::ERROR("could not read .mesh file: {}", meshfile);

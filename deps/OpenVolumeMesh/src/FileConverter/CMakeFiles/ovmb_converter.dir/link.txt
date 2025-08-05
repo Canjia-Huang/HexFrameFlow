@@ -1,0 +1,1 @@
+/opt/homebrew/bin/g++-14  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/ovmb_converter.dir/ovmb_converter.cc.o -o ../../Build/bin/ovmb_converter  ../../Build/lib/libOpenVolumeMesh.a

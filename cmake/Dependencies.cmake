@@ -39,7 +39,9 @@ if(USE_GUROBI)
 endif()
 
 ############################################# OpenVolumeMesh #############################################
-find_package(OpenVolumeMesh REQUIRED)
-add_definitions(-DNDEBUG)
-include_directories(${OPENVOLUMEMESH_INCLUDE_DIR})
-link_directories(${OPENVOLUMEMESH_LIBRARY_DIR})
+add_subdirectory("${CMAKE_SOURCE_DIR}/deps")
+include_directories("${CMAKE_SOURCE_DIR}/deps/OpenVolumeMesh/src")
+#find_package(OpenVolumeMesh REQUIRED)
+#add_definitions(-DNDEBUG)
+#include_directories(${OPENVOLUMEMESH_INCLUDE_DIR})
+#link_directories(${OPENVOLUMEMESH_LIBRARY_DIR})

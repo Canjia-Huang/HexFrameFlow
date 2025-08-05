@@ -1,0 +1,35 @@
+src/CMakeFiles/OpenVolumeMesh.dir/OpenVolumeMesh/IO/enums.cc.o: \
+ /Users/canjia/OpenVolumeMesh/src/OpenVolumeMesh/IO/enums.cc \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/array \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/compare \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/version.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/aarch64-apple-darwin24/bits/c++config.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/aarch64-apple-darwin24/bits/os_defines.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/aarch64-apple-darwin24/bits/cpu_defines.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/pstl/pstl_config.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/initializer_list \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/type_traits \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/functexcept.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/exception_defines.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/stl_algobase.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/cpp_type_traits.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/ext/type_traits.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/ext/numeric_traits.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/stl_pair.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/move.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/utility.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/stl_iterator_base_types.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/stl_iterator_base_funcs.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/concept_check.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/debug/assertions.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/stl_iterator.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/ptr_traits.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/debug/debug.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/predefined_ops.h \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bit \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/concepts \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/bits/range_access.h \
+ /Users/canjia/OpenVolumeMesh/src/OpenVolumeMesh/IO/enums.hh \
+ /Users/canjia/OpenVolumeMesh/src/OpenVolumeMesh/Config/Export.hh \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/include/c++/14/cstddef \
+ /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/current/gcc/aarch64-apple-darwin24/14/include/stddef.h

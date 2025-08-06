@@ -12,6 +12,8 @@ if(APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
     add_compile_options(-O2 -DNDEBUG)
 endif()
 
+add_definitions(-D_USE_MATH_DEFINES)
+
 # CMake module path
 list(PREPEND CMAKE_MODULE_PATH
         ${CMAKE_CURRENT_LIST_DIR}/cmake)

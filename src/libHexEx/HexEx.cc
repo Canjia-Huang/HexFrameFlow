@@ -18,10 +18,16 @@
  * along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// -----------------------------------------------------------------------------
+// Modifications made by Canjia Huang on 2025-8-6:
+//   - Adjusted code formatting in selected sections
+//   - Output more information
+// -----------------------------------------------------------------------------
+
 
 #include "HexEx.hh"
-
 #include <OpenVolumeMesh/FileManager/FileManager.hh>
+#include "utils/log.h"
 
 namespace HexEx {
 
@@ -35,7 +41,10 @@ void extractHexMesh(const std::string& inFileName, const std::string& outFileNam
 
     OpenVolumeMesh::IO::FileManager fm;
 
-    fm.writeFile(outFileName, hexMesh);
+    if (fm.writeFile(outFileName, hexMesh))
+        LOG::INFO("Save hex mesh to: {}", outFileName);
+    else
+        LOG::ERROR("Failed to save hex mesh to: {}", outFileName);
 }
 
 } // namespace HexEx

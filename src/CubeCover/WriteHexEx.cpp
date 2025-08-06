@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
+//   - Output more information
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -17,8 +18,8 @@
 #include "WriteHexEx.h"
 #include <iostream>
 #include <fstream>
-
 #include <Eigen/Dense>
+#include "utils/log.h"
 
 namespace CubeCover
 {
@@ -28,6 +29,8 @@ namespace CubeCover
         const Eigen::MatrixXi& T,
         const Eigen::MatrixXd& vals
         ){
+        LOG::TRACE(__FUNCTION__);
+
         if (4 * T.rows() != vals.rows()) {
             std::cerr << "dimension mismatch between T and vals" << std::endl;
             return false;

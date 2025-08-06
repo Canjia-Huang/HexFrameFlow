@@ -9,6 +9,7 @@
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
 //   - Added code comments
+//   - Output more information
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -24,6 +25,7 @@
 #include <Eigen/Core>
 #include <iostream>
 #include <cctype>
+#include "utils/log.h"
 
 namespace CubeCover {
     /**
@@ -39,11 +41,13 @@ namespace CubeCover {
      */
     template <typename DerivedV, typename DerivedF, typename DerivedT>
     bool readMESH(
-        const std::string mesh_file_name,
+        const std::string& mesh_file_name,
         Eigen::PlainObjectBase<DerivedV>& V,
         Eigen::PlainObjectBase<DerivedT>& T,
-        Eigen::PlainObjectBase<DerivedF>& F)
-    {
+        Eigen::PlainObjectBase<DerivedF>& F
+        ){
+        LOG::TRACE(__FUNCTION__);
+
         V.resize(0, 0);
         T.resize(0, 0);
         F.resize(0, 0);

@@ -18,9 +18,14 @@
  * along with HexEx.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// -----------------------------------------------------------------------------
+// Modifications made by Canjia Huang on 2025-8-6:
+//   - Adjusted code formatting in selected sections
+//   - Output more information
+// -----------------------------------------------------------------------------
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+
+#include <cmath>
 
 #include "HexExtractor.hh"
 
@@ -35,6 +40,7 @@
 #include "DerivedExactPredicates.hh"
 #include "Direction.hh"
 #include "FileAccessor.hh"
+#include "utils/log.h"
 
 
 using namespace OpenVolumeMesh;
@@ -140,6 +146,8 @@ void HexExtractor::writeToFile(std::string filename)
 
 void HexExtractor::extractHVertices()
 {
+    LOG::TRACE(__FUNCTION__);
+
     intermediateHexMesh.clear(false);
 
     for (auto vh : inputMesh.vertices())
@@ -359,6 +367,8 @@ void HexExtractor::extractHVertices()
 
 void HexExtractor::enumerateHPorts()
 {
+    LOG::TRACE(__FUNCTION__);
+
   for (auto v_it = intermediateHexMesh.vertices_begin(); v_it != intermediateHexMesh.vertices_end(); ++v_it)
     {
         hPortsOnVertex[*v_it].clear();
@@ -714,6 +724,8 @@ void HexExtractor::enumerateDarts(HPortHandle port, bool secondary)
 
 void HexExtractor::enumerateDarts()
 {
+    LOG::TRACE(__FUNCTION__);
+
     auto n = intermediateHexMesh.n_vertices();
 
     for (auto i = 0u; i < n; ++i)
@@ -839,7 +851,9 @@ int HexExtractor::getNumDarts(bool exclude_unconnected)
 
 void HexExtractor::traceDarts()
 {
-    auto n = (int)intermediateHexMesh.n_vertices();
+    LOG::TRACE(__FUNCTION__);
+
+    auto n = static_cast<int>(intermediateHexMesh.n_vertices());
 
     HEXEX_DEBUG_ONLY(std::cout << "Tracing darts" << std::endl;)
     tracing = true; // enable warnings when passing through degenerate faces
@@ -1043,7 +1057,9 @@ bool HexExtractor::connectDartToPreviousSecondaryDart(Dart& dart)
 
 void HexExtractor::connectDartsToPreviousSecondaryDart()
 {
-    auto n = (int)intermediateHexMesh.n_vertices();
+    LOG::TRACE(__FUNCTION__);
+
+    auto n = static_cast<int>(intermediateHexMesh.n_vertices());
 
     HEXEX_DEBUG_ONLY(std::cout << "connecting darts 1 " << std::endl;)
 
@@ -1142,7 +1158,9 @@ bool HexExtractor::connectDartToNeighborSecondaryDart2(Dart& dart)
 
 void HexExtractor::connectDartsToNeighborSecondaryDart()
 {
-    auto n = (int)intermediateHexMesh.n_vertices();
+    LOG::TRACE(__FUNCTION__);
+
+    auto n = static_cast<int>(intermediateHexMesh.n_vertices());
 
     HEXEX_DEBUG_ONLY(std::cout << "connecting darts 3 " << std::endl;)
 
@@ -1237,7 +1255,9 @@ bool HexExtractor::connectDartToOppositeSecondaryDart(Dart& dart)
 
 void HexExtractor::connectDartsToOppositeSecondaryDart()
 {
-    auto n = (int)intermediateHexMesh.n_vertices();
+    LOG::TRACE(__FUNCTION__);
+
+    auto n = static_cast<int>(intermediateHexMesh.n_vertices());
 
     HEXEX_DEBUG_ONLY(std::cout << "connecting darts 4 " << std::endl;)
 
@@ -2125,6 +2145,7 @@ bool HexExtractor::fixProblems4(bool mergeVertices)
 
 void HexExtractor::fixProblems(int iterations, bool mergeVertices)
 {
+    LOG::TRACE(__FUNCTION__);
 
     HEXEX_DEBUG_ONLY(std::cout << "fixing problems" << std::endl;)
 
@@ -2132,7 +2153,7 @@ void HexExtractor::fixProblems(int iterations, bool mergeVertices)
 
     for (int i = 0; i < iterations && changes; ++i)
     {
-
+        LOG::DEBUG("fixing problems iteration {} of {}", i+1, iterations);
         HEXEX_DEBUG_ONLY(std::cout << "fixing problems iteration " << i+1 << " of " << iterations << std::endl;)
 
         changes = true;
@@ -2288,6 +2309,7 @@ void HexExtractor::computeLocalUVFromSecondaryDarts(CellHandle ch)
 
 void HexExtractor::computeLocalUVsFromSecondaryDarts()
 {
+    LOG::TRACE(__FUNCTION__);
 
     for (auto ch : intermediateHexMesh.cells())
         localCellUVs[ch].clear();
@@ -2471,6 +2493,8 @@ void HexExtractor::extractFaceFromSecondaryDarts(Dart* dart)
 
 void HexExtractor::extractFacesFromDarts()
 {
+    LOG::TRACE(__FUNCTION__);
+
     deleteHexFaces();
 
     HEXEX_DEBUG_ONLY(std::cout << "extracting faces" << std::endl;)
@@ -2523,6 +2547,8 @@ void HexExtractor::extractCellFromSecondaryDarts(HalfFaceHandle hfh)
 
 void HexExtractor::extractCellsFromDarts()
 {
+    LOG::TRACE(__FUNCTION__);
+
     deleteHexCells();
 
 
@@ -2858,6 +2884,8 @@ void HexExtractor::randomizeParametrization(double offsetSize, double keepBounda
 
 void HexExtractor::sanitizeParametrization(bool snapBoundary, bool extremeTruncation)
 {
+    LOG::TRACE(__FUNCTION__);
+
     computeCellTypes();
 
     calculateValences();
@@ -2870,13 +2898,14 @@ void HexExtractor::sanitizeParametrization(bool snapBoundary, bool extremeTrunca
 
     computeCellTypes();
 
-    HEXEX_DEBUG_ONLY(
-    auto volume = getTotalParametricVolume();
-    if (volume < 1)
-        std::cerr << "Warning: Total parametric volume is " << volume << std::endl;
+    // HEXEX_DEBUG_ONLY(
+    if (auto volume = getTotalParametricVolume();
+        volume < 1) {
+        LOG::WARN("Warning: Total parametric volume is {} < 1", volume);
+    }
     else
-        std::cout << "Total parametric volume is " << volume << std::endl;
-    )
+        LOG::DEBUG("Total parametric volume is {}", volume);
+    // )
 }
 
 bool HexExtractor::isInCell(CellHandle ch, Parameter param)

@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
+//   - Output more information
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -20,6 +21,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/Core>
 #include "CubeCover.h"
+#include "utils/log.h"
 
 namespace CubeCover {
 
@@ -53,18 +55,19 @@ namespace CubeCover {
         Eigen::VectorXd& result,
         const Eigen::VectorXd& b,
         const std::vector<int>& intvars,
-        const CubeCover::CubeCoverOptions& opts)
-    {
-        if (opts.solver == CubeCoverOptions::MIPSolver::MS_GUROBI)
-        {
+        const CubeCover::CubeCoverOptions& opts
+        ){
+        LOG::TRACE(__FUNCTION__);
+
+        if (opts.solver == CubeCoverOptions::MIPSolver::MS_GUROBI) {
             return GurobiMIPWrapper(constraints, A, result, b, intvars, opts.MIPtol, opts.verbose);
         }
-        else if (opts.solver == CubeCoverOptions::MIPSolver::MS_COMISO)
-        {
+        if (opts.solver == CubeCoverOptions::MIPSolver::MS_COMISO) {
             return CoMISoMIPWrapper(constraints, A, result, b, intvars, opts.MIPtol, opts.verbose);
         }
 
         // unreachable
+        LOG::ERROR("Do not set any MIP solvers!");
         return false;
     }
     

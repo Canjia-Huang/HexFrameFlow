@@ -8,6 +8,8 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
+//   - Output more information
+//   - Modify Line 545
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -23,6 +25,7 @@
 #include <set>
 #include <Eigen/Dense>
 #include <vector>
+#include "utils/log.h"
 
 namespace CubeCover {
 
@@ -106,11 +109,12 @@ namespace CubeCover {
 
     bool integrate(const Eigen::MatrixXd& V, const FrameField& field, Eigen::MatrixXd& soupValues, const CubeCoverOptions &opt)
     {
+        LOG::TRACE(__FUNCTION__);
+
         bool verbose = opt.verbose;
 
-        if (verbose)
-        {
-            std::cout << "Cutting to a simply-connected domain..." << std::endl;
+        if (verbose) {
+            LOG::DEBUG("Cutting to a simply-connected domain...");
         }
 
         const TetMeshConnectivity& mesh = field.meshConnectivity();
@@ -121,9 +125,8 @@ namespace CubeCover {
 
         std::vector<int> cutFaces;
         cutToSimplyConnected(mesh, singularEdges, cutFaces, true);
-        if (verbose)
-        {
-            std::cout << "...done, found " << cutFaces.size() << " seam faces" << std::endl;
+        if (verbose) {
+            LOG::DEBUG("...done, found {} seam faces", cutFaces.size());
         }
 
         int ntets = mesh.nTets();
@@ -144,8 +147,7 @@ namespace CubeCover {
         int nfaces = mesh.nFaces();
         UnionFind uf(soupdofs);
 
-        for (int i = 0; i < mesh.nFaces(); i++)
-        {
+        for (int i = 0; i < mesh.nFaces(); i++) {
             if (mesh.isBoundaryFace(i) || cutfaceset.count(i))
                 continue;
 
@@ -154,15 +156,12 @@ namespace CubeCover {
             AssignmentGroup o = field.faceAssignment(i);
             int fromidx[3];
             int toidx[3];
-            for (int j = 0; j < 3; j++)
-            {
+            for (int j = 0; j < 3; j++) {
                 fromidx[j] = vpf * 4 * fromtet + vpf * mesh.faceTetVertexIndex(i, 0, j);
                 toidx[j] = vpf * 4 * totet + vpf * mesh.faceTetVertexIndex(i, 1, j);
             }
-            for (int j = 0; j < 3; j++)
-            {
-                for (int k = 0; k < vpf; k++)
-                {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < vpf; k++) {
                     int destindex = o.targetVector(k);
                     int destsign = o.targetSign(k);
                     uf.unionTogether(fromidx[j] + k, toidx[j] + destindex, destsign);                    
@@ -171,12 +170,9 @@ namespace CubeCover {
         }
 
         // boundary faces must lie on the same integer plane if alignment is on
-        if (opt.boundaryConditions == CubeCoverOptions::BoundaryConditions::BC_FORCEINTEGER)
-        {
-            for (int i = 0; i < mesh.nFaces(); i++)
-            {
-                if (mesh.isBoundaryFace(i))
-                {
+        if (opt.boundaryConditions == CubeCoverOptions::BoundaryConditions::BC_FORCEINTEGER) {
+            for (int i = 0; i < mesh.nFaces(); i++) {
+                if (mesh.isBoundaryFace(i)) {
                     int tet = mesh.faceTet(i, 0);
                     if (tet == -1)
                         tet = mesh.faceTet(i, 1);
@@ -187,21 +183,17 @@ namespace CubeCover {
                     int alignedvec = closestFrameVec(normal, bdryframe);
                     assert(alignedvec != -1);
                     std::set<int> faceverts;
-                    for (int j = 0; j < 3; j++)
-                    {
+                    for (int j = 0; j < 3; j++) {
                         faceverts.insert(mesh.faceVertex(i, j));
                     }
                     std::vector<int> tofuse;
-                    for (int j = 0; j < 4; j++)
-                    {
-                        if (faceverts.count(mesh.tetVertex(tet, j)))
-                        {
+                    for (int j = 0; j < 4; j++) {
+                        if (faceverts.count(mesh.tetVertex(tet, j))) {
                             int soupidx = 4 * vpf * tet + vpf * j + alignedvec;
                             tofuse.push_back(soupidx);
                         }
                     }
-                    for (int j = 1; j < tofuse.size(); j++)
-                    {
+                    for (int j = 1; j < tofuse.size(); j++) {
                         uf.unionTogether(tofuse[0], tofuse[j], 1);
                     }
                 }
@@ -210,11 +202,9 @@ namespace CubeCover {
 
         std::set<int> singularcurvesoupdofs;
 
-        if (opt.parameterizationType == CubeCoverOptions::ParameterizationType::PT_INTEGERGRID)
-        {
+        if (opt.parameterizationType == CubeCoverOptions::ParameterizationType::PT_INTEGERGRID) {
             int nsingedges = field.nSingularEdges();
-            for (int i = 0; i < nsingedges; i++)
-            {
+            for (int i = 0; i < nsingedges; i++) {
                 int edge = field.singularEdge(i);
                 assert(!mesh.isBoundaryEdge(edge));
                 int nbtets = mesh.nEdgeTets(edge);
@@ -224,12 +214,10 @@ namespace CubeCover {
 
                 // must check all neighboring tets because there might be multiple connected components of tets separated by seam faces
 
-                for (int j = 0; j < nbtets; j++)
-                {
+                for (int j = 0; j < nbtets; j++) {
                     // circulate, starting from here
                     AssignmentGroup o(vpf);
-                    for (int k = 0; k < nbtets; k++)
-                    {
+                    for (int k = 0; k < nbtets; k++) {
                         int nb = (j + k) % nbtets;
                         int tet = mesh.edgeTet(edge, nb);
                         int faceidx = mesh.edgeTetFaceIndex(edge, nb, 1);
@@ -241,17 +229,13 @@ namespace CubeCover {
                             faceo = faceo.inverse();
                         o = faceo * o;
                     }
-                    for (int k = 0; k < vpf; k++)
-                    {
-                        if (o.targetVector(k) != k || o.targetSign(k) != 1)
-                        {
+                    for (int k = 0; k < vpf; k++) {
+                        if (o.targetVector(k) != k || o.targetSign(k) != 1) {
                             int dofs[2];
-                            for (int l = 0; l < 2; l++)
-                            {
+                            for (int l = 0; l < 2; l++) {
                                 int vertidx = -1;
                                 int tet = mesh.edgeTet(edge, j);
-                                for (int m = 0; m < 4; m++)
-                                {
+                                for (int m = 0; m < 4; m++) {
                                     if (mesh.tetVertex(tet, m) == vs[l])
                                         vertidx = m;
                                 }
@@ -269,8 +253,7 @@ namespace CubeCover {
 
         std::map<int, int> labelmap;
         int reduceddofs = 0;
-        for (int i = 0; i < soupdofs; i++)
-        {
+        for (int i = 0; i < soupdofs; i++) {
             int l, s;
             uf.find(i, l, s);
             auto it = labelmap.find(l);
@@ -280,8 +263,7 @@ namespace CubeCover {
             }
         }
 
-        struct Constraint
-        {
+        struct Constraint {
             Constraint(int dof1, int sign1,
                 int dof2, int sign2,
                 int intdof, int sign3)
@@ -310,24 +292,19 @@ namespace CubeCover {
 
 
         std::vector<Constraint> constraints;
-        for (int i = 0; i < mesh.nFaces(); i++)
-        {                        
-            if(cutfaceset.count(i))
-            {
+        for (int i = 0; i < mesh.nFaces(); i++) {
+            if(cutfaceset.count(i)) {
                 int fromtet = mesh.faceTet(i, 0);
                 int totet = mesh.faceTet(i, 1);
                 AssignmentGroup o = field.faceAssignment(i);
                 int fromidx[3];
                 int toidx[3];
-                for (int j = 0; j < 3; j++)
-                {
+                for (int j = 0; j < 3; j++) {
                     fromidx[j] = vpf * 4 * fromtet + vpf * mesh.faceTetVertexIndex(i, 0, j);
                     toidx[j] = vpf * 4 * totet + vpf * mesh.faceTetVertexIndex(i, 1, j);
                 }
-                for (int j = 0; j < 3; j++)
-                {
-                    for (int k = 0; k < vpf; k++)
-                    {
+                for (int j = 0; j < 3; j++) {
+                    for (int k = 0; k < vpf; k++) {
                         int destindex = o.targetVector(k);
                         int destsign = o.targetSign(k);
                         int froml, froms;
@@ -347,15 +324,12 @@ namespace CubeCover {
         int totalconstraints = constraints.size();
         std::map<int, std::vector<int> > constraintsbyvert;
         std::map<int, std::map<std::pair<int, int>, int> > representatives;
-        for (int i = 0; i < totalconstraints; i++)
-        {
+        for (int i = 0; i < totalconstraints; i++) {
             constraintsbyvert[constraints[i].d1].push_back(i);
         }
-        for (auto& it : constraintsbyvert)
-        {
+        for (auto& it : constraintsbyvert) {
             std::map<std::pair<int, int>, int> &representativeconstraints = representatives[it.first];
-            for (auto& it2 : it.second)
-            {
+            for (auto& it2 : it.second) {
                 int d2 = constraints[it2].d2;
                 int s2 = constraints[it2].sd2;
                 auto prev = representativeconstraints.find({ d2,s2 });
@@ -384,36 +358,30 @@ namespace CubeCover {
         }
 
         std::set<int> implicitzerolabels;
-        for (auto it : implicitzeros)
-        {
+        for (auto it : implicitzeros) {
             int label, sign;
             cuf.find(it, label, sign);
             implicitzerolabels.insert(label);
         }
         int jumpdofs = 0;
         std::map<int, int> jumplabelmap;        
-        for (auto& it : representatives)
-        {
-            for (auto& it2 : it.second)
-            {
+        for (auto& it : representatives) {
+            for (auto& it2 : it.second) {
                 int itdof = constraints[it2.second].intd;
                 int label, sign;
                 cuf.find(itdof, label, sign);
-                if (!implicitzerolabels.count(label))
-                {
+                if (!implicitzerolabels.count(label)) {
                     auto idx = jumplabelmap.find(label);
-                    if (idx == jumplabelmap.end())
-                    {
+                    if (idx == jumplabelmap.end()) {
                         jumplabelmap[label] = jumpdofs++;
                     }
                 }
             }
         }
 
-        if (verbose)
-        {
-            std::cout << "MIP problem has " << reduceddofs << " parameter variables and " << jumpdofs << " transition jumps" << std::endl;
-            std::cout << "(" << implicitzerolabels.size() << " transition jumps implicitly zero)" << std::endl;
+        if (verbose) {
+            LOG::DEBUG("MIP problem has {}  parameter variables and {}  transition jumps", reduceddofs, jumpdofs);
+            LOG::DEBUG("({}  transition jumps implicitly zero)", implicitzerolabels.size());
         }
 
         std::set<int> integerreduceddofs;
@@ -421,10 +389,8 @@ namespace CubeCover {
         
         int nconstraints = 0;
         std::vector<Eigen::Triplet<double> > Ccoeffs;
-        for (auto& it : representatives)
-        {
-            for (auto& it2 : it.second)
-            {
+        for (auto& it : representatives) {
+            for (auto& it2 : it.second) {
                 int intdof = constraints[it2.second].intd;
                 int intdsign = constraints[it2.second].sintd;
 
@@ -436,8 +402,7 @@ namespace CubeCover {
                 Ccoeffs.push_back({ nconstraints, tol, double(tos) });
                 int idlabel, idsign;
                 cuf.find(intdof, idlabel, idsign);
-                if (!implicitzerolabels.count(idlabel))
-                {
+                if (!implicitzerolabels.count(idlabel)) {
                     Ccoeffs.push_back({ nconstraints, reduceddofs + jumplabelmap[idlabel], double(idsign*intdsign) });
                 }
                 nconstraints++;
@@ -446,10 +411,8 @@ namespace CubeCover {
 
         bool forceBoundaryAlignment = (opt.boundaryConditions == CubeCoverOptions::BoundaryConditions::BC_FORCEINTEGER);
 
-        for (int i = 0; i < mesh.nFaces(); i++)
-        {            
-            if (mesh.isBoundaryFace(i) && forceBoundaryAlignment)
-            {                
+        for (int i = 0; i < mesh.nFaces(); i++) {
+            if (mesh.isBoundaryFace(i) && forceBoundaryAlignment) {
                 int tet = mesh.faceTet(i, 0);
                 if (tet == -1)
                     tet = mesh.faceTet(i, 1);
@@ -460,14 +423,11 @@ namespace CubeCover {
                 int alignedvec = closestFrameVec(normal, bdryframe);
                 assert(alignedvec != -1);
                 std::set<int> faceverts;
-                for (int j = 0; j < 3; j++)
-                {
+                for (int j = 0; j < 3; j++) {
                     faceverts.insert(mesh.faceVertex(i, j));
                 }
-                for (int j = 0; j < 4; j++)
-                {
-                    if (faceverts.count(mesh.tetVertex(tet, j)))
-                    {
+                for (int j = 0; j < 4; j++) {
+                    if (faceverts.count(mesh.tetVertex(tet, j))) {
                         int soupidx = 4 * vpf * tet + vpf * j + alignedvec;
                         int l, s;
                         uf.find(soupidx, l, s);
@@ -477,10 +437,8 @@ namespace CubeCover {
             }            
         }
 
-        if (opt.parameterizationType == CubeCoverOptions::ParameterizationType::PT_INTEGERGRID)
-        {
-            for (auto it : singularcurvesoupdofs)
-            {
+        if (opt.parameterizationType == CubeCoverOptions::ParameterizationType::PT_INTEGERGRID) {
+            for (auto it : singularcurvesoupdofs) {
                 int label, sign;
                 uf.find(it, label, sign);
                 integerreduceddofs.insert(labelmap[label]);
@@ -488,45 +446,39 @@ namespace CubeCover {
         }
 
 
-        if (verbose)
-        {
-            std::cout << integerreduceddofs.size() << " parameter DOFs are integer" << std::endl;
+        if (verbose) {
+            LOG::DEBUG("{} parameter DOFs are integer", integerreduceddofs.size());
         }
 
         // pin one corner
         int maxintcoords = -1;
         int pindof = 0;
-        for (int i = 0; i < ntets; i++)
-        {
-            for (int j = 0; j < 4; j++)
-            {
+        for (int i = 0; i < ntets; i++) {
+            for (int j = 0; j < 4; j++) {
                 int intcoords = 0;
-                for (int k = 0; k < vpf; k++)
-                {
+                for (int k = 0; k < vpf; k++) {
                     int l, s;
                     uf.find(vpf * 4 * i + vpf * j + k, l, s);
                     if (integerreduceddofs.count(labelmap[l]))
                         intcoords++;
                 }
-                if (intcoords > maxintcoords)
-                {
+                if (intcoords > maxintcoords) {
                     maxintcoords = intcoords;
                     pindof = 4 * vpf * i + vpf * j;
                 }
             }
         }
-        for (int i = 0; i < vpf; i++)
-        {
+        for (int i = 0; i < vpf; i++) {
             int l, s;
             uf.find(pindof + i, l, s);
             Ccoeffs.push_back({ nconstraints, labelmap[l], 1.0 });
             nconstraints++;
         }
         if (verbose)
-            std::cout << "Pinning DOFs " << pindof << " through " << pindof + vpf << " to the origin (" << maxintcoords << " integer dimensions)" << std::endl;
+            LOG::DEBUG("Pinning DOFs {}  through {} to the origin ({} integer dimensions)", pindof, pindof + vpf, maxintcoords);
 
         if(verbose)
-            std::cout << "Enforcing " << nconstraints << " constraints" << std::endl;
+            LOG::DEBUG("Enforcing {} constraints", nconstraints);
         
         Eigen::SparseMatrix<double> C(nconstraints, reduceddofs + jumpdofs + 1);
         C.setFromTriplets(Ccoeffs.begin(), Ccoeffs.end());
@@ -537,11 +489,9 @@ namespace CubeCover {
         // D: computes a per-tet gradient of each phi function
         std::vector<Eigen::Triplet<double> > Dcoeffs;
         Eigen::VectorXd rhs(3 * vpf * ntets);
-        for (int i = 0; i < ntets; i++)
-        {
+        for (int i = 0; i < ntets; i++) {
             Eigen::Matrix3d B;
-            for (int j = 0; j < 3; j++)
-            {
+            for (int j = 0; j < 3; j++) {
                 B.row(j) = V.row(mesh.tetVertex(i, j + 1)) - V.row(mesh.tetVertex(i, 0));
             }
             Eigen::Matrix<double, 3, 4> S;
@@ -549,22 +499,17 @@ namespace CubeCover {
                 -1, 0, 1, 0,
                 -1, 0, 0, 1;
             Eigen::Matrix<double, 3, 4> Grad = B.inverse() * S;
-            for (int j = 0; j < 4; j++)
-            {
-                for (int k = 0; k < 3; k++)
-                {
-                    for (int l = 0; l < vpf; l++)
-                    {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < 3; k++) {
+                    for (int l = 0; l < vpf; l++) {
                         int label, sign;
                         uf.find(12 * i + vpf * j + l, label, sign);
-                        Dcoeffs.push_back({ 3 * vpf * i + 3 * l + k, labelmap[label], sign * Grad(k,j) });
+                        Dcoeffs.emplace_back( 3 * vpf * i + 3 * l + k, labelmap[label], sign * Grad(k,j) );
                     }
                 }
             }
-            for (int k = 0; k < 3; k++)
-            {
-                for (int l = 0; l < vpf; l++)
-                {
+            for (int k = 0; k < 3; k++) {
+                for (int l = 0; l < vpf; l++) {
                     rhs[3 * vpf * i + 3 * l + k] = opt.scale * field.tetFrame(i)(l, k);
                 }
             }
@@ -575,16 +520,14 @@ namespace CubeCover {
         // inner product
         std::vector<Eigen::Triplet<double> > Mcoeffs;
         double totvol = 0;
-        for (int i = 0; i < ntets; i++)
-        {
+        for (int i = 0; i < ntets; i++) {
             Eigen::Vector3d e1 = V.row(mesh.tetVertex(i, 1)) - V.row(mesh.tetVertex(i, 0));
             Eigen::Vector3d e2 = V.row(mesh.tetVertex(i, 2)) - V.row(mesh.tetVertex(i, 0));
             Eigen::Vector3d e3 = V.row(mesh.tetVertex(i, 3)) - V.row(mesh.tetVertex(i, 0));
             double vol = 1.0 / 6.0 * std::fabs(e1.cross(e2).dot(e3));
             totvol += vol;
-            for (int j = 0; j < 3 * vpf; j++)
-            {
-                Mcoeffs.push_back({ 3 * vpf * i + j, 3 * vpf * i + j, vol });
+            for (int j = 0; j < 3 * vpf; j++) {
+                Mcoeffs.emplace_back( 3 * vpf * i + j, 3 * vpf * i + j, vol );
             }
         }
         Eigen::SparseMatrix<double> M(3 * vpf * ntets, 3 * vpf * ntets);
@@ -600,39 +543,31 @@ namespace CubeCover {
         Eigen::VectorXd result;
         std::vector<int> intdofs;
         
-//        if (opt.parameterizationType == CubeCoverOptions::ParameterizationType::PT_SEAMLESS)
-        {            
-            for (int i = 0; i < jumpdofs; i++)
-            {
+        if (opt.parameterizationType == CubeCoverOptions::ParameterizationType::PT_SEAMLESS) {
+            for (int i = 0; i < jumpdofs; i++) {
                 intdofs.push_back(reduceddofs + i);
             }
         }
-        for (auto it : integerreduceddofs)
-        {
+        for (auto it : integerreduceddofs) {
             intdofs.push_back(it);
         }
 
-        if (!MIP(C, MIPA, result, MIPrhs, intdofs, opt))
-        {
-            if (verbose)
-            {
-                std::cerr << "Problem with MIP solve!" << std::endl;
+        if (!MIP(C, MIPA, result, MIPrhs, intdofs, opt)) {
+            if (verbose) {
+                LOG::DEBUG("Problem with MIP solve!");
             }
             soupValues.resize(4 * ntets, vpf);
             soupValues.setZero();
         }
         else
         {
-            if (verbose)
-            {
-                std::cout << "Integer variables: ";
+            if (verbose) {
+                LOG::DEBUG("Integer variables: ");
                 for (int i = 0; i < jumpdofs; i++)
-                    std::cout << result[reduceddofs + i] << " ";
-                std::cout << std::endl;
+                    LOG::DEBUG("\t{}", result[reduceddofs + i]);
             }
-            if (verbose)
-            {
-                std::cout << "Problem residual: " << (MIPA * result - MIPrhs).norm() << std::endl;
+            if (verbose) {
+                LOG::DEBUG("Problem residual: {}", (MIPA * result - MIPrhs).norm());
             }
 
             for (int i : intdofs)
@@ -644,12 +579,9 @@ namespace CubeCover {
             std::cout << "C: " << (C * augresult).norm() << std::endl;           
 
             soupValues.resize(4 * ntets, vpf);
-            for (int i = 0; i < ntets; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    for (int k = 0; k < vpf; k++)
-                    {
+            for (int i = 0; i < ntets; i++) {
+                for (int j = 0; j < 4; j++) {
+                    for (int k = 0; k < vpf; k++) {
                         int label, sign;
                         uf.find(vpf * 4 * i + vpf * j + k, label, sign);
                         soupValues(4 * i + j, k) = result[labelmap[label]] * sign;                        

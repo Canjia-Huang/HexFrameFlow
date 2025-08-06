@@ -9,6 +9,7 @@
 // Modifications made by Canjia Huang on 2025-8-1:
 //   - Adjusted code formatting in selected sections
 //   - Added code comments
+//   - Output more information
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -20,6 +21,7 @@
 #include <iostream>
 #include "FrameField.h"
 #include "TetMeshConnectivity.h"
+#include "utils/log.h"
 
 namespace CubeCover {
 
@@ -31,6 +33,8 @@ bool readFrameField(
     Eigen::MatrixXi& assignments,
     const bool verbose
     ) {
+    LOG::TRACE(__FUNCTION__);
+
     // check that fraFilename ends in .fra
     // if ends .fra call v1
     // if ends in .bfra call v2

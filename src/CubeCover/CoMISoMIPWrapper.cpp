@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-7-31:
 //   - Adjusted code formatting in selected sections
+//   - Output more information
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -16,6 +17,7 @@
 
 #include "MIPWrapper.h"
 #include <iostream>
+#include "utils/log.h"
 
 #ifdef HAS_COMISO
 #include "CoMISo/Solver/ConstrainedSolver.hh"
@@ -29,16 +31,17 @@ namespace CubeCover
         const Eigen::VectorXd& b,
         const std::vector<int>& intvars,
         double tol,
-        bool verbose)
-    {
+        bool verbose
+        ){
+        LOG::TRACE(__FUNCTION__);
 
         /*
-     * Solves the following MIP to tolerance tol:
-     * min_x  x^T A x + b x
-     *  s.t.  C [x 1]^T = 0
-     *        x_i is integer, for each i in intvars
-     * Note that A is n x n, b is n x 1, and C is m x (n+1).
-     */
+         * Solves the following MIP to tolerance tol:
+         * min_x  x^T A x + b x
+         *  s.t.  C [x 1]^T = 0
+         *        x_i is integer, for each i in intvars
+         * Note that A is n x n, b is n x 1, and C is m x (n+1).
+         */
 
         // CoMISo solvers Mx = rhs. In our case M = 2A and rhs = -b.
 
@@ -77,7 +80,9 @@ namespace CubeCover
         // cannot be const
         std::vector<int> intvarscopy = intvars;
 
+        LOG::TRACE("Start solver.solve");
         solver.solve(C, M, x, rhs, intvarscopy, 0.0, verbose, false);
+        LOG::TRACE("solver.solve done");
 
         result.resize(A.cols());
         for (int i = 0; i < A.cols(); i++)
@@ -99,7 +104,9 @@ namespace CubeCover
         double tol,
         bool verbose
         ) {
-        std::cerr << "CoMISo not available" << std::endl;
+        LOG::TRACE(__FUNCTION__);
+
+        LOG::ERROR("CoMISo not available");
         return false;
     }
 };

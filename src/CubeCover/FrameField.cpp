@@ -135,8 +135,10 @@ void FrameField::setSingularEdges() {
   }
 }
 
-FrameField* fromFramesAndAssignments(const TetMeshConnectivity& tetMesh, const Eigen::MatrixXd& frames,
-                                     const Eigen::MatrixXi& assignments, bool verbose) {
+FrameField* fromFramesAndAssignments(
+  const TetMeshConnectivity& tetMesh, const Eigen::MatrixXd& frames,
+  const Eigen::MatrixXi& assignments, bool verbose
+  ) {
   int ntets = tetMesh.nTets();
   if (frames.rows() % ntets != 0) {
     if (verbose) {

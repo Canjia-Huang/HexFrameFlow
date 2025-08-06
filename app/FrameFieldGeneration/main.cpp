@@ -13,7 +13,6 @@
 // =============================================================================
 
 #include "FF.h"
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <sstream>
 #include <iostream>
@@ -24,7 +23,6 @@
 #include "CLI11/CLI11.hpp"
 #include "utils/log.h"
 #include "utils/parse_filepath.h"
-#include <Eigen/Dense>
 #include "CubeCover/readMeshFixed.h"
 
 #ifdef _WIN32

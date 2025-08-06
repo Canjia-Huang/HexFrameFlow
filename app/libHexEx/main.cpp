@@ -30,11 +30,11 @@ bool isOutFileGood(const std::string& filename) {
 }
 
 int main(const int argc, char *argv[]) {
-    spdlog::set_level(spdlog::level::info);
-
     /* Settings */
     std::string inFilename;
     std::string outFilename;
+    bool verbose_mode = false;
+    double scale = 0.0;
 
     /* App */
     CLI::App app{"HexEx"};
@@ -50,10 +50,19 @@ int main(const int argc, char *argv[]) {
         outFilename,
         "Output file (.ovm) path."
         );
+    app.add_flag("--verbose",
+        verbose_mode,
+        "Output more process information. (default: false)"
+        );
 
     CLI11_PARSE(app, argc, argv);
 
     /* Process */
+    if (verbose_mode)
+        spdlog::set_level(spdlog::level::trace);
+    else
+        spdlog::set_level(spdlog::level::info);
+
     if (outFilename.empty())
         outFilename = get_parentpath(inFilename) + get_filename(inFilename) + ".ovm";
     else if (get_filename(outFilename).empty())
@@ -70,6 +79,7 @@ int main(const int argc, char *argv[]) {
     }
 
     HexEx::extractHexMesh(inFilename, outFilename);
+
 
     return 0;
 }

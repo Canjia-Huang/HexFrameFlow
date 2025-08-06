@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 // Modifications made by Canjia Huang on 2025-7-31:
 //   - Adjusted code formatting in selected sections
+//   - Output more information
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -20,6 +21,7 @@
 #include "Integration.h"
 #include "CurlCorrection.h"
 #include <iostream>
+#include "utils/log.h"
 
 namespace CubeCover
 {
@@ -31,18 +33,21 @@ namespace CubeCover
         Eigen::MatrixXd& parameterization,
         const CubeCoverOptions &opt
         ){
+        LOG::TRACE(__FUNCTION__);
+
         const TetMeshConnectivity mesh(T);
         if (!mesh.isManifold(opt.verbose))
             return false;
         if (!mesh.isFaceConnected()) {
             if (opt.verbose) {
-                std::cerr << "input mesh is not face-connected" << std::endl;
+                LOG::ERROR("input mesh is not face-connected");
                 return false;
             }
         }
 
         
         FrameField* field = nullptr;
+        LOG::TRACE("Creating frame field...");
         if (opt.assignmentHandling == CubeCoverOptions::AssignmentHandling::AH_USEPROVIDED) {
             field = fromFramesAndAssignments(mesh, frames, assignments, opt.verbose);
         }
@@ -56,9 +61,12 @@ namespace CubeCover
         if (!field)
             return false;
 
-        if (opt.curlCorrection)
+        if (opt.curlCorrection) {
+            LOG::TRACE("Correcting curl...");
             curlCorrect(V, *field, opt.curlCorrection, opt.verbose);
+        }
 
+        LOG::TRACE("Integrating...");
         if (!integrate(V, *field, parameterization, opt)) {
             delete field;
             return false;

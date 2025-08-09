@@ -296,6 +296,13 @@ The following example can automatically generate an all-hex mesh based on this f
 
 Upon successful execution, a hexahedral mesh file `fandisk.ovm` (OpenVolumeMesh format) will be generated in the `../../data` directory.
 
+# :ok_hand: License notice
+
+This repository contains components governed by separate open-source licenses:
+
+- [[the13fools/Mint3D]](https://github.com/the13fools/Mint3D) under the license **Mozilla Public License 2.0 (MPL-2.0)** ([full license](src/CubeCover/LICENSE))
+- [[feengg/libHexEx]](https://github.com/feengg/libHexEx) under the license **GNU General Public License v3.0 (GPL-3.0)** ([full license](src/libHexEx/LICENSE))
+
 # :bug: Common issues
 
 - :warning: Errors may arise during the compilation process:

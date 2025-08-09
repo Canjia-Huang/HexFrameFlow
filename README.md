@@ -7,9 +7,9 @@
 <th>Result hexahedral mesh</th>
 </tr>
 <tr>
-<td> <img src=".pic/tet.png"> </td>
-<td> <img src=".pic/frame.png"> </td>
-<td> <img src=".pic/hex.png"> </td>
+<td> <img src=".pic/tet.png" width="600"> </td>
+<td> <img src=".pic/frame.png" width="600"> </td>
+<td> <img src=".pic/hex.png" width="600"> </td>
 </tr>
 </table>
 
@@ -17,7 +17,7 @@ This repo provides a integrated workflow for automatically generating all-hexahe
 This workflow integrates three key works:
 
 - [**Practical 3D frame field generation**](https://dl.acm.org/doi/10.1145/2980179.2982408) - it is designed to generate a frame field from an input tetrahedral mesh, with the code adapted from the supplementary materials of the cited paper [[supp]](https://dl.acm.org/doi/suppl/10.1145/2980179.2982408/suppl_file/233-0220.zip).
-- [**CubeCover– Parameterization of 3D Volumes**](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8659.2011.02014.x) - it generates an integer-grid parametrization from an input tetrahedral mesh and its associated frame field， with the code adapted from repos [[evouga/CubeCover]](https://github.com/evouga/CubeCover) and [[the13fools/Mint3D]](https://github.com/the13fools/Mint3D).
+- [**CubeCover– Parameterization of 3D Volumes**](https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8659.2011.02014.x) - it generates an integer-grid parametrization from an input tetrahedral mesh and its associated frame field, with the code adapted from repos [[evouga/CubeCover]](https://github.com/evouga/CubeCover) and [[the13fools/Mint3D]](https://github.com/the13fools/Mint3D).
 - [**HexEx: robust hexahedral mesh extraction**](https://dl.acm.org/doi/abs/10.1145/2897824.2925976) - it robustly extracts an all-hex mesh from the input integer grid parametrization, with the code adapted from the official open-source implementation [[feengg/libHexEx]](https://github.com/feengg/libHexEx) and [[dbrandes-welfenlab/libHexExFull]](https://github.com/dbrandes-welfenlab/libHexExFull).
 
 If you use this code in your research, please cite the following original work:

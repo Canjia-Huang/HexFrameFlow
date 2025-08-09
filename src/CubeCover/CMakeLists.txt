@@ -18,12 +18,18 @@ target_sources(${PROJECT_NAME}_CUBECOVER
 )
 
 if(USE_COMISO)
-    target_link_libraries(${PROJECT_NAME}_CUBECOVER igl_copyleft::comiso)
+    target_link_libraries(${PROJECT_NAME}_CUBECOVER
+            PRIVATE
+            igl_copyleft::comiso)
     target_compile_definitions(${PROJECT_NAME}_CUBECOVER PUBLIC HAS_COMISO)
 endif()
 if(USE_GUROBI)
-    target_link_libraries(${PROJECT_NAME}_CUBECOVER ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY} )
+    target_link_libraries(${PROJECT_NAME}_CUBECOVER
+            PRIVATE
+            ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY})
     target_compile_definitions(${PROJECT_NAME}_CUBECOVER PUBLIC HAS_GUROBI)
 endif()
 
-target_link_libraries(${PROJECT_NAME}_CUBECOVER igl::core)
+target_link_libraries(${PROJECT_NAME}_CUBECOVER
+        PRIVATE
+        igl::core)

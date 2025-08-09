@@ -97,12 +97,14 @@ int main(const int argc, char *argv[]) {
         spdlog::set_level(spdlog::level::info);
 
     if (use_gurobi) {
+        LOG::DEBUG("Use Gurobi to solve MIP");
 #ifndef HAS_GUROBI
         LOG::ERROR("The CMake option 'USE_GUROBI' has not been set.");
         return 1;
 #endif
     }
     else {
+        LOG::DEBUG("Use comiso to solve MIP");
 #ifndef HAS_COMISO
         LOG::ERROR("The CMake option 'USE_COMISO' has not been set.");
         return 1;

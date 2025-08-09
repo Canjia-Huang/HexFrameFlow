@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 IF(WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
 ENDIF()
-
 if(APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
     add_compile_options(-O2 -DNDEBUG)
 endif()
@@ -23,6 +22,8 @@ include(add_lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # 3rdParty
+set(USE_GUROBI OFF CACHE BOOL "Use Gurobi for solving MIPs")
+set(USE_COMISO ON CACHE BOOL "Use Comiso for solving MIPs")
 include(Dependencies)
 
 add_subdirectory(src)

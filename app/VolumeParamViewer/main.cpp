@@ -1,4 +1,4 @@
-// =============================================================================
+./// =============================================================================
 // This file contains code derived from the following source(s):
 //   Original Repository: https://github.com/evouga/CubeCover
 //   Original File Path:  /tools/volumeparamviewer/src/main.cpp

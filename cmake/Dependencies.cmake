@@ -22,25 +22,20 @@ set(LIBIGL_WITH_COMISO $CACHE{USE_COMISO} CACHE BOOL "Build LIBIGL with CoMISo" 
 include(libigl)
 
 ############################################# MIP Solvers #############################################
-set(USE_GUROBI OFF CACHE BOOL "Use Gurobi for solving MIPs")
-set(USE_COMISO ON CACHE BOOL "Use Comiso for solving MIPs")
-
 if(USE_GUROBI)
     # use gurobi
-    find_package(GUROBI)
+    find_package(Gurobi REQUIRED)
     if(NOT GUROBI_FOUND)
         message(SEND_ERROR "Unable to find Gurobi. Make sure that the env GUROBI_HOME is set")
     else()
-        message("Found Gurobi in : " ${GUROBI_INCLUDE_DIRS})
-        message("Found Gurobi cxx lib in : " ${GUROBI_CXX_LIBRARY})
-        message("Found Gurobi lib in : " ${GUROBI_LIBRARY})
-        include_directories(${GUROBI_INCLUDE_DIRS})
+        include_directories(${GUROBI_INCLUDE_DIR})
     endif()
 endif()
 
 ############################################# OpenVolumeMesh #############################################
 add_subdirectory("${CMAKE_SOURCE_DIR}/deps")
 include_directories("${CMAKE_SOURCE_DIR}/deps/OpenVolumeMesh/src")
+
 #find_package(OpenVolumeMesh REQUIRED)
 #add_definitions(-DNDEBUG)
 #include_directories(${OPENVOLUMEMESH_INCLUDE_DIR})

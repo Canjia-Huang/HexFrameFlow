@@ -296,13 +296,6 @@ The following example can automatically generate an all-hex mesh based on this f
 
 Upon successful execution, a hexahedral mesh file `fandisk.ovm` (OpenVolumeMesh format) will be generated in the `../../data` directory.
 
-# :ok_hand: License notice
-
-This repository contains components governed by separate open-source licenses:
-
-- [[the13fools/Mint3D]](https://github.com/the13fools/Mint3D) under the license **Mozilla Public License 2.0 (MPL-2.0)** ([full license](src/CubeCover/LICENSE))
-- [[feengg/libHexEx]](https://github.com/feengg/libHexEx) under the license **GNU General Public License v3.0 (GPL-3.0)** ([full license](src/libHexEx/LICENSE))
-
 # :bug: Common issues
 
 - :warning: Errors may arise during the compilation process:
@@ -317,3 +310,10 @@ This repository contains components governed by separate open-source licenses:
 - :warning: If you want to use the `integergrid` on Windows, you need to copy the dynamic link library `libgcc_s_seh-1.dll`, `libgfortran-3.dll, libopenblas.dll`, `libquadmath-0.dll` (may located at "bin\_deps\comiso-src\ext\OpenBLAS-v0.2.14-Win64-int64\bin") to the same directory as the executable file.
 
 - :warning: It is preferable to run the `integergrid` on Linux, as I have observed that the **comiso** solver often fails to converge properly on Windows and macOS for unclear reasons :thinking:.
+
+# :ok_hand: License notice
+
+This repository contains components governed by separate open-source licenses:
+
+- [[the13fools/Mint3D]](https://github.com/the13fools/Mint3D) under the license **Mozilla Public License 2.0 (MPL-2.0)** ([full license](src/CubeCover/LICENSE))
+- [[feengg/libHexEx]](https://github.com/feengg/libHexEx) under the license **GNU General Public License v3.0 (GPL-3.0)** ([full license](src/libHexEx/LICENSE))

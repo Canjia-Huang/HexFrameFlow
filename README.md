@@ -302,7 +302,7 @@ Upon successful execution, a hexahedral mesh file `fandisk.ovm` (OpenVolumeMesh 
   ```
   error: ISO C++17 does not allow 'register' storage class specifier [-Wregister]
     84 |         register double a = (pts[i][k] - pmin[k]) / msize;
-        |         ^~~~~~~~
+       |         ^~~~~~~~
   ```
 
   This error originates from the file "build/_deps/comiso-src/ext/gmm-4.2/include/gmm/gmm_domain_decomp.h". You can simply removing the keyword `register` from Line 84 of this file and then recompiling, the issue can be resolved.

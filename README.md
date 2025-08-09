@@ -99,7 +99,7 @@ If you use this code in your research, please cite the following original work:
 
 # :link: Requirements / dependencies
 - [CLI11](https://github.com/CLIUtils/CLI11) (already included)
-- [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) (version >= 3.4)
+- [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page)
 - [Gurobi](https://www.gurobi.com) (optional)
 - [libigl (with comiso)](https://libigl.github.io) (already included)
 - [OpenVolumeMesh](https://www.graphics.rwth-aachen.de/software/openvolumemesh/) (already included)

@@ -4,7 +4,7 @@
 <tr>
 <th>Input tetrahedral mesh</th>
 <th>Result Frame field</th>	
-<th>Result tetrahedral mesh</th>
+<th>Result hexahedral mesh</th>
 </tr>
 <tr>
 <td> <img src=".pic/tet.png"> </td>

@@ -130,11 +130,10 @@ int main(const int argc, char *argv[]) {
             V.row(i) *= scale_factor;
     }
     LOG::TRACE("Read tet mesh done");
+    LOG::DEBUG("V rows: {}, cols: {}", V.rows(), V.cols());
+    LOG::DEBUG("T rows: {}, cols: {}", T.rows(), T.cols());
 
     /* Read frame field */
-    if (get_extension(frafile) == ".ofs") {
-        
-    }
     Eigen::MatrixXd frames;
     Eigen::MatrixXi assignments;
     if (!CubeCover::readFrameField(frafile, permfile, T, frames, assignments, true)) {
@@ -142,6 +141,7 @@ int main(const int argc, char *argv[]) {
         return -1;
     }
     LOG::TRACE("Read frame field done");
+    LOG::DEBUG("frames rows: {}, cols: {}", frames.rows(), frames.cols());
 
     /* CubeCover */
     CubeCover::CubeCoverOptions opt;

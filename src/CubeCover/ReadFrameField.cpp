@@ -82,6 +82,9 @@ bool readFrameField(
         }
 
     }
+    if (fraExt == "ofs") {
+        return readFrameField_ofs(fraFilename, frames);
+    }
     if (verbose) std::cerr << "Unknown file extension: " << fraExt << std::endl;
     return false;
 }
@@ -240,6 +243,37 @@ bool readFrameField_v2(
         std::cerr << "Error: Unable to deserialize matrix: " << e.what() << std::endl;
         return false;
     }
+}
+
+bool readFrameField_ofs(
+    const std::string& fraFilename,
+    Eigen::MatrixXd& frames
+    ) {
+    std::ifstream ifs(fraFilename);
+    if (!ifs) {
+        LOG::ERROR("Cannot open file: {}", fraFilename);
+        return false;
+    }
+
+    std::vector<double> frame_components;
+
+    std::string sline;
+    while (std::getline(ifs, sline)) {
+        std::istringstream ins(sline);
+        for (int i = 0; i < 9; ++i) {
+            double f;
+            ins >> f;
+            frame_components.push_back(f);
+        }
+    }
+
+    frames.resize(frame_components.size() / 3, 3);
+    for (int i = 0; i < frames.rows(); ++i) {
+        for (int j = 0; j < 3; ++j)
+            frames(i, j) = frame_components[3*i+j];
+    }
+
+    return true;
 }
 
 bool deserializeFF3FramesFromMetricDrivenFrames3D(

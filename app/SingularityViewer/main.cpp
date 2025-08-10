@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     app.add_option(
         "fra_path",
         frafile,
-        "Frame field file (.fra) path."
+        "Frame field file (.fra/.ofs) path."
         )->check(CLI::ExistingFile);
     app.add_option(
         "bad_verts_path",

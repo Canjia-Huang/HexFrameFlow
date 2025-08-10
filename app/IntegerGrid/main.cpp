@@ -48,7 +48,7 @@ int main(const int argc, char *argv[]) {
     app.add_option(
         "fra_path",
         frafile,
-        "Frame field file (.fra) path"
+        "Frame field file (.fra/.ofs) path"
         )->check(CLI::ExistingFile)->required();
     app.add_option(
         "--perm",
@@ -132,6 +132,9 @@ int main(const int argc, char *argv[]) {
     LOG::TRACE("Read tet mesh done");
 
     /* Read frame field */
+    if (get_extension(frafile) == ".ofs") {
+        
+    }
     Eigen::MatrixXd frames;
     Eigen::MatrixXi assignments;
     if (!CubeCover::readFrameField(frafile, permfile, T, frames, assignments, true)) {

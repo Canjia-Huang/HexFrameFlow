@@ -296,7 +296,7 @@ The following example can automatically generate an all-hex mesh based on this f
 
 Upon successful execution, a hexahedral mesh file `fandisk.ovm` (OpenVolumeMesh format) will be generated in the `../../data` directory.
 
-# :bug: Common issues
+# :bug: Known issues
 
 - :warning: Errors may arise during the compilation process:
   ```

@@ -123,7 +123,7 @@ make -j
 > [!NOTE]
 > By default, use **comiso** to solve the MIP problem (rather than **Gurobi**). If you wish to use **Gurobi** instead, you can add the CMake option `-DUSE_GUROBI`.
 
-If problems are encountered during the compilation, you can refer to [[Common issues]](#bug-common-issues) to resolve some known common issues.
+If problems are encountered during the compilation, you can refer to [[Known issues]](#bug-known-issues) to resolve some known common issues.
 
 # :computer: Usage
 
